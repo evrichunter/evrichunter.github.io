@@ -336,7 +336,7 @@
   /* ── Testimonios ── */
   #testimonios { padding:var(--sv) 0; background:var(--surface); position:relative; }
   #testimonios::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); }
-  .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:52px; }
+  .testi-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:52px; min-width:0; }
   .testi-card { background:var(--bg); border:1px solid var(--border); padding:32px 28px; position:relative; transition:border-color var(--tr),transform var(--tr); display:flex; flex-direction:column; gap:22px; }
   .testi-card:hover { border-color:rgba(200,169,110,0.2); transform:translateY(-3px); }
   .testi-card::before { content:'"'; position:absolute; top:16px; right:22px; font-family:var(--font-hero); font-size:5rem; line-height:1; color:rgba(200,169,110,0.07); pointer-events:none; }
@@ -399,7 +399,6 @@
     .services-grid { grid-template-columns:repeat(2,1fr); }
     .prod-grid { grid-template-columns:1fr; }
     .pkg-grid  { grid-template-columns:1fr; }
-    .testi-grid{ grid-template-columns:repeat(3,1fr); }
     .agenda-wrap{ grid-template-columns:1fr; gap:40px; }
     .shows-block{ flex-direction:column; gap:28px; }
   }
