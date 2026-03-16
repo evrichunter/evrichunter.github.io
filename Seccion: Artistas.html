@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVRIC HUNTER | Portal de Artistas</title>
+  <link rel="icon" type="image/png" href="LOGO.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <style>
+  /* ── Variables — mismas que la página principal ── */
+  :root {
+    --bg:      #070707;
+    --surface: #0f0f0f;
+    --border:  rgba(255,255,255,0.07);
+    --gold:    #c8a96e;
+    --text:    #ede8e0;
+    --muted:   #888882;
+    --font-hero: 'Bebas Neue', sans-serif;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --tr: 0.35s ease;
+
+    /* ── Colores de estado ── */
+    --pendiente:  rgba(255,255,255,0.1);   /* Gris neutro */
+    --en-proceso: rgba(200,169,110,0.15);  /* Dorado suave */
+    --terminado:  rgba(74,222,128,0.15);   /* Verde */
+    --entregado:  rgba(99,179,237,0.15);   /* Azul */
+
+    --pendiente-color:  #666;
+    --en-proceso-color: #c8a96e;
+    --terminado-color:  #4ade80;
+    --entregado-color:  #63b3ed;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ════════════════════════════════════════
+     PANTALLA DE LOGIN
+  ════════════════════════════════════════ */
+  #pantalla-login {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    text-align: center;
+  }
+  .login-logo {
+    font-family: var(--font-hero);
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .login-logo span { color: var(--gold); }
+  .login-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 36px 32px;
+  }
+  .login-box h2 {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .login-box p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .login-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-hero);
+    font-size: 1.4rem;
+    letter-spacing: 0.14em;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 16px;
+    outline: none;
+    transition: border-color var(--tr);
+    margin-bottom: 16px;
+  }
+  .login-input:focus { border-color: var(--gold); }
+  .login-input::placeholder { color: #333; font-size: 1rem; letter-spacing: 0.1em; }
+  .login-btn {
+    width: 100%;
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    font-family: var(--font-head);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    transition: opacity var(--tr);
+  }
+  .login-btn:hover { opacity: 0.85; }
+  .login-error {
+    font-size: 0.8rem;
+    color: rgba(255,80,80,0.8);
+    margin-top: 12px;
+    display: none;
+  }
+  .login-error.visible { display: block; }
+
+  /* ════════════════════════════════════════
+     PANTALLA DEL PROYECTO
+  ════════════════════════════════════════ */
+  #pantalla-proyecto {
+    display: none;
+    width: 100%;
+    max-width: 760px;
+    padding: 24px;
+  }
+
+  /* Header del proyecto */
+  .proy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .proy-logo {
+    font-family: var(--font-hero);
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .proy-logo span { color: var(--gold); }
+  .proy-salir {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    cursor: pointer;
+    background: none;
+    font-family: var(--font-body);
+    transition: border-color var(--tr), color var(--tr);
+  }
+  .proy-salir:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Info del artista */
+  .proy-artista {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .proy-bienvenida {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .proy-nombre {
+    font-family: var(--font-hero);
+    font-size: 2.4rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .proy-tema {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .proy-tema strong { color: var(--text); }
+
+  /* Fecha de entrega */
+  .proy-entrega {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+  }
+  .proy-entrega strong { color: var(--gold); font-family: var(--font-head); }
+
+  /* ── Etapas del proyecto ── */
+  .etapas { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+  .etapa {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .etapa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .etapa-nombre {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .etapa-icono { font-size: 1.1rem; }
+
+  /* Pasos dentro de cada etapa */
+  .etapa-pasos {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .paso {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    position: relative;
+  }
+  /* ── Estados visuales de cada paso ── */
+  .paso.pendiente  { background: var(--pendiente);  color: var(--pendiente-color);  border-color: rgba(255,255,255,0.05); }
+  .paso.en-proceso { background: var(--en-proceso); color: var(--en-proceso-color); border-color: rgba(200,169,110,0.3); }
+  .paso.terminado  { background: var(--terminado);  color: var(--terminado-color);  border-color: rgba(74,222,128,0.3); }
+  .paso.entregado  { background: var(--entregado);  color: var(--entregado-color);  border-color: rgba(99,179,237,0.3); }
+
+  /* Indicador activo (punto pulsante) */
+  .paso.en-proceso::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin-right: 6px;
+    animation: pulsito 1.5s infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulsito { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+
+  /* Nota interna de la etapa */
+  .etapa-nota {
+    margin-top: 12px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    border-left: 2px solid var(--border);
+    padding-left: 12px;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* ── Sección de descarga ── */
+  .proy-descarga {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .proy-descarga h3 {
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .proy-descarga p {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .btn-descarga {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold);
+    color: var(--bg);
+    font-family: var(--font-head);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    text-decoration: none;
+    transition: opacity var(--tr);
+    white-space: nowrap;
+  }
+  .btn-descarga:hover { opacity: 0.85; }
+  .btn-descarga.bloqueado {
+    background: var(--border);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* ── Leyenda de estados ── */
+  .leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .leyenda-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .leyenda-dot.pendiente  { background: #444; }
+  .leyenda-dot.en-proceso { background: var(--gold); }
+  .leyenda-dot.terminado  { background: #4ade80; }
+  .leyenda-dot.entregado  { background: #63b3ed; }
+
+  /* ── Responsive ── */
+  @media (max-width: 500px) {
+    .proy-nombre { font-size: 1.8rem; }
+    .etapa-pasos { flex-direction: column; }
+    .paso { text-align: center; }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+       PANTALLA 1 — LOGIN CON CÓDIGO DE ARTISTA
+  ════════════════════════════════════════════════════════ -->
+  <div id="pantalla-login">
+    <div class="login-logo">EVRIC<span>·</span>HUNTER</div>
+    <p class="login-subtitle">Portal de artistas</p>
+
+    <div class="login-box">
+      <h2>Ingresá tu código</h2>
+      <p>Tu productor te enviará el código para acceder al estado de tu proyecto.</p>
+
+      <!-- ✏️  Campo de código -->
+      <input
+        type="text"
+        id="inputCodigo"
+        class="login-input"
+        placeholder="Tu código aquí"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter') ingresar()"
+      />
+
+      <button class="login-btn" onclick="ingresar()">Ver mi proyecto</button>
+      <p class="login-error" id="errorMsg">Código incorrecto. Consultá a Evric.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       PANTALLA 2 — ESTADO DEL PROYECTO
+       (Se muestra después del login correcto)
+  ════════════════════════════════════════════════════════ -->
+  <div id="pantalla-proyecto">
+
+    <div class="proy-header">
+      <span class="proy-logo">EVRIC<span>·</span>HUNTER</span>
+      <button class="proy-salir" onclick="salir()">← Salir</button>
+    </div>
+
+    <!-- Info del artista — se completa dinámicamente desde el JS -->
+    <div class="proy-artista">
+      <p class="proy-bienvenida">Hola,</p>
+      <h1 class="proy-nombre" id="proy-nombre"></h1>
+      <p class="proy-tema">Tema en producción: <strong id="proy-tema"></strong></p>
+      <div class="proy-entrega">
+        📅 Fecha estimada de entrega: <strong id="proy-fecha"></strong>
+      </div>
+    </div>
+
+    <!-- Etapas del proyecto — se generan dinámicamente desde el JS -->
+    <div class="etapas" id="etapas-container"></div>
+
+    <!-- Sección de descarga -->
+    <div class="proy-descarga">
+      <div>
+        <h3>Archivos finales</h3>
+        <p id="proy-descarga-texto">Los archivos estarán disponibles cuando el proyecto esté entregado.</p>
+      </div>
+      <a id="proy-descarga-btn" href="#" class="btn-descarga bloqueado" target="_blank">
+        ⬇ Descargar archivos
+      </a>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="leyenda">
+      <div class="leyenda-item"><div class="leyenda-dot pendiente"></div>Pendiente</div>
+      <div class="leyenda-item"><div class="leyenda-dot en-proceso"></div>En proceso</div>
+      <div class="leyenda-item"><div class="leyenda-dot terminado"></div>Terminado</div>
+      <div class="leyenda-item"><div class="leyenda-dot entregado"></div>Entregado</div>
+    </div>
+
+  </div>
+
+  <script>
+
+  /* ══════════════════════════════════════════════════════════
+     📋 BASE DE DATOS DE ARTISTAS
+     ✏️  Acá editás todo. Cada entrada es un artista.
+         Para agregar un artista nuevo: copiá un bloque completo
+         y pegalo como entrada nueva del objeto.
+
+     FORMATO DE ESTADOS:
+       "pendiente"  → gris   (no empezado)
+       "en-proceso" → dorado (trabajando ahora)
+       "terminado"  → verde  (listo)
+       "entregado"  → azul   (ya enviado al artista)
+  ══════════════════════════════════════════════════════════ */
+  const ARTISTAS = {
+
+    /* ════════ ✏️  ARTISTA 1 ════════
+       codigo: la palabra que el artista escribe para entrar
+       (no importan mayúsculas, el sistema las ignora) */
+    "zampe": {
+      nombre:  "Zampe",                        // ✏️  Nombre que aparece en pantalla
+      tema:    "Una Bachata (feat. Rodrigo)",   // ✏️  Nombre del tema o proyecto
+      fecha:   "28 de Marzo, 2026",             // ✏️  Fecha estimada de entrega
+
+      etapas: [
+        {
+          icono: "🎙️",
+          nombre: "Grabación de voces",
+          pasos: [
+            { nombre: "Sesión agendada",  estado: "terminado"  },
+            { nombre: "Voces grabadas",   estado: "terminado"  },
+            { nombre: "Voces procesadas", estado: "en-proceso" },
+          ],
+          // ✏️  Nota interna visible para el artista (podés dejarla vacía "")
+          nota: "Las voces principales están listas. Procesando los coros."
+        },
+        {
+          icono: "🎚️",
+          nombre: "Mezcla",
+          pasos: [
+            { nombre: "Pendiente",    estado: "pendiente" },
+            { nombre: "En proceso",   estado: "pendiente" },
+            { nombre: "Terminada",    estado: "pendiente" },
+          ],
+          nota: ""
+        },
+        {
+          icono: "💿",
+          nombre: "Mastering",
+          pasos: [
+            { nombre: "Pendiente",    estado: "pendiente" },
+            { nombre: "En proceso",   estado: "pendiente" },
+            { nombre: "Terminado",    estado: "pendiente" },
+            { nombre: "Por entregar", estado: "pendiente" },
+          ],
+          nota: ""
+        }
+      ],
+
+      // ✏️  Link de Google Drive para descargar los archivos finales
+      // Dejalo en "" mientras no esté listo — el botón se bloquea solo
+      descarga: "",
+      descargaTexto: "Los archivos estarán disponibles cuando el mastering esté terminado."
+    },
+
+    /* ════════ ✏️  ARTISTA 2 ════════ */
+    "gabryel": {
+      nombre:  "Gabryel",
+      tema:    "Bancame 5",
+      fecha:   "15 de Abril, 2026",
+
+      etapas: [
+        {
+          icono: "🎙️",
+          nombre: "Grabación de voces",
+          pasos: [
+            { nombre: "Sesión agendada",  estado: "terminado" },
+            { nombre: "Voces grabadas",   estado: "terminado" },
+            { nombre: "Voces procesadas", estado: "terminado" },
+          ],
+          nota: "Todo grabado y procesado. Pasando a mezcla."
+        },
+        {
+          icono: "🎚️",
+          nombre: "Mezcla",
+          pasos: [
+            { nombre: "Iniciada",   estado: "terminado"  },
+            { nombre: "En proceso", estado: "en-proceso" },
+            { nombre: "Terminada",  estado: "pendiente"  },
+          ],
+          nota: "Trabajando en la mezcla de los coros y el drop."
+        },
+        {
+          icono: "💿",
+          nombre: "Mastering",
+          pasos: [
+            { nombre: "Pendiente",    estado: "pendiente" },
+            { nombre: "En proceso",   estado: "pendiente" },
+            { nombre: "Terminado",    estado: "pendiente" },
+            { nombre: "Por entregar", estado: "pendiente" },
+          ],
+          nota: ""
+        }
+      ],
+
+      descarga: "",
+      descargaTexto: "Los archivos estarán disponibles cuando el mastering esté terminado."
+    },
+
+    /* ════════ ✏️  ARTISTA 3 — ejemplo con todo terminado ════════ */
+    "valentina": {
+      nombre:  "Valentina Márquez",
+      tema:    "Coleccionando Heridas",
+      fecha:   "Entregado ✓",
+
+      etapas: [
+        {
+          icono: "🎙️",
+          nombre: "Grabación de voces",
+          pasos: [
+            { nombre: "Sesión agendada",  estado: "terminado" },
+            { nombre: "Voces grabadas",   estado: "terminado" },
+            { nombre: "Voces procesadas", estado: "terminado" },
+          ],
+          nota: ""
+        },
+        {
+          icono: "🎚️",
+          nombre: "Mezcla",
+          pasos: [
+            { nombre: "Iniciada",   estado: "terminado" },
+            { nombre: "En proceso", estado: "terminado" },
+            { nombre: "Terminada",  estado: "terminado" },
+          ],
+          nota: ""
+        },
+        {
+          icono: "💿",
+          nombre: "Mastering",
+          pasos: [
+            { nombre: "Iniciado",     estado: "terminado" },
+            { nombre: "En proceso",   estado: "terminado" },
+            { nombre: "Terminado",    estado: "terminado" },
+            { nombre: "Por entregar", estado: "entregado" },
+          ],
+          nota: ""
+        }
+      ],
+
+      // ✏️  Cuando el proyecto está listo: pegá el link de Drive acá
+      descarga: "https://drive.google.com/tu-link-aqui",
+      descargaTexto: "Tu proyecto está listo. Descargá los archivos finales."
+    },
+
+    /* ✏️  Para agregar más artistas: copiá el bloque de arriba y pegalo acá */
+
+  };
+  /* ══════════════════════════════════════════════════════════
+     Fin de la base de datos — no editar de acá para abajo
+  ══════════════════════════════════════════════════════════ */
+
+
+  /* ── Lógica de login ── */
+  function ingresar() {
+    const codigo = document.getElementById('inputCodigo').value.trim().toLowerCase();
+    const error  = document.getElementById('errorMsg');
+
+    if (ARTISTAS[codigo]) {
+      error.classList.remove('visible');
+      mostrarProyecto(ARTISTAS[codigo]);
+    } else {
+      error.classList.add('visible');
+      document.getElementById('inputCodigo').style.borderColor = 'rgba(255,80,80,0.5)';
+      setTimeout(() => {
+        document.getElementById('inputCodigo').style.borderColor = '';
+      }, 1200);
+    }
+  }
+
+  /* ── Mostrar pantalla del proyecto ── */
+  function mostrarProyecto(artista) {
+    document.getElementById('pantalla-login').style.display    = 'none';
+    document.getElementById('pantalla-proyecto').style.display = 'block';
+
+    // Datos del artista
+    document.getElementById('proy-nombre').textContent = artista.nombre;
+    document.getElementById('proy-tema').textContent   = artista.tema;
+    document.getElementById('proy-fecha').textContent  = artista.fecha;
+
+    // Generar etapas
+    const container = document.getElementById('etapas-container');
+    container.innerHTML = '';
+    artista.etapas.forEach(etapa => {
+      const div = document.createElement('div');
+      div.className = 'etapa';
+      div.innerHTML = `
+        <div class="etapa-header">
+          <div class="etapa-nombre">
+            <span class="etapa-icono">${etapa.icono}</span>
+            ${etapa.nombre}
+          </div>
+        </div>
+        <div class="etapa-pasos">
+          ${etapa.pasos.map(p => `<div class="paso ${p.estado}">${p.nombre}</div>`).join('')}
+        </div>
+        ${etapa.nota ? `<p class="etapa-nota">${etapa.nota}</p>` : ''}
+      `;
+      container.appendChild(div);
+    });
+
+    // Descarga
+    const btnDescarga  = document.getElementById('proy-descarga-btn');
+    const textoDescarga = document.getElementById('proy-descarga-texto');
+    textoDescarga.textContent = artista.descargaTexto;
+    if (artista.descarga) {
+      btnDescarga.href = artista.descarga;
+      btnDescarga.classList.remove('bloqueado');
+    } else {
+      btnDescarga.href = '#';
+      btnDescarga.classList.add('bloqueado');
+    }
+  }
+
+  /* ── Salir ── */
+  function salir() {
+    document.getElementById('pantalla-proyecto').style.display = 'none';
+    document.getElementById('pantalla-login').style.display    = 'block';
+    document.getElementById('inputCodigo').value = '';
+  }
+
+  </script>
+</body>
+</html>
