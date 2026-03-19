@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ════════════════════════════════════════
+       ✏️  SEO — Optimizado para Google
+  ════════════════════════════════════════ -->
+  <title>Cursos de Producción Musical | EVRIC HUNTER — NoiseMakers Academy</title>
+  <link rel="icon" type="image/png" href="LOGO.png" />
+  <meta name="description" content="Aprendé producción musical, procesamiento de voces, mezcla y mastering con Evric Hunter. Cursos online para artistas y productores emergentes en Buenos Aires y toda Latinoamérica. NoiseMakers Academy." />
+  <meta name="keywords" content="curso producción musical, curso mezcla mastering, curso procesamiento de voces, aprender a producir música, productor musical Buenos Aires, NoiseMakers Academy, Evric Hunter cursos" />
+
+  <!-- Open Graph para redes sociales -->
+  <meta property="og:title" content="NoiseMakers Academy — Cursos de Producción Musical" />
+  <meta property="og:description" content="Convertite en un Noise Maker. Cursos de producción, voces, mezcla, mastering y playback en vivo." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://evrichunter.com/cursos" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <style>
+  /* ══════════════════════════════════════════════════════════════
+     🎨 VARIABLES — mismas que la página principal
+  ══════════════════════════════════════════════════════════════ */
+  :root {
+    --bg:         #070707;
+    --surface:    #0f0f0f;
+    --surface-2:  #141414;
+    --border:     rgba(255,255,255,0.07);
+    --gold:       #c8a96e;
+    --gold-light: #e2c98a;
+    --gold-dim:   rgba(200,169,110,0.10);
+    --gold-glow:  rgba(200,169,110,0.28);
+    --font-hero:  'Bebas Neue', sans-serif;
+    --font-head:  'Syne', sans-serif;
+    --font-body:  'DM Sans', sans-serif;
+    --text:       #ede8e0;
+    --muted:      #555550;
+    --muted-2:    #888882;
+    --max-w:      1160px;
+    --tr:         0.38s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 16px; line-height: 1.7; overflow-x: hidden; min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 28px; }
+
+  /* ── Cursor ── */
+  body { cursor: none; }
+  #cur-dot  { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .15s, height .15s; }
+  #cur-ring { width: 34px; height: 34px; border: 1px solid rgba(200,169,110,.35); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); }
+  @media (max-width:768px) { body { cursor: auto; } #cur-dot, #cur-ring { display:none; } }
+
+  /* ── Grain ── */
+  body::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:1; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E"); opacity:0.03; mix-blend-mode:overlay; }
+
+  /* ══════════════════════════════════════════════════════════════
+     🧭 NAVBAR
+  ══════════════════════════════════════════════════════════════ */
+  nav { position: fixed; top: 0; width: 100%; z-index: 500; padding: 24px 0; transition: padding var(--tr), background var(--tr), border-color var(--tr); border-bottom: 1px solid transparent; }
+  nav.scrolled { padding: 14px 0; background: rgba(7,7,7,0.93); backdrop-filter: blur(20px); border-bottom-color: var(--border); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .logo { font-family: var(--font-hero); font-size: 1.5rem; letter-spacing: 0.06em; color: var(--text); line-height: 1; }
+  .logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 22px; list-style: none; }
+  .nav-links a { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted-2); transition: color var(--tr); position: relative; }
+  .nav-links a::after { content:''; position:absolute; bottom:-3px; left:0; width:0; height:1px; background:var(--gold); transition:width var(--tr); }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--gold); }
+  .nav-links a.active::after { width: 100%; }
+  .nav-portal { display:flex; align-items:center; gap:7px; font-family:var(--font-head); font-size:0.7rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted-2); border:1px solid var(--border); padding:8px 14px; border-radius:2px; transition:color var(--tr),border-color var(--tr),background var(--tr); flex-shrink:0; }
+  .nav-portal:hover { color:var(--gold); border-color:rgba(200,169,110,0.4); background:rgba(200,169,110,0.05); }
+  .nav-portal svg { width:12px; height:12px; }
+  .nav-wa { display:flex; align-items:center; gap:7px; font-family:var(--font-head); font-size:0.74rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--bg); background:var(--gold); padding:9px 20px; border-radius:2px; transition:opacity var(--tr),transform var(--tr); flex-shrink:0; }
+  .nav-wa:hover { opacity:.85; transform:translateY(-1px); }
+  .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; }
+  .hamburger span { display:block; width:22px; height:1.5px; background:var(--text); }
+  .mobile-menu { display:none; position:fixed; inset:0; z-index:490; background:rgba(7,7,7,0.97); backdrop-filter:blur(24px); flex-direction:column; align-items:center; justify-content:center; gap:26px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-family:var(--font-hero); font-size:2.4rem; letter-spacing:0.04em; color:var(--text); transition:color var(--tr); }
+  .mobile-menu a:hover { color:var(--gold); }
+  .mob-close { position:absolute; top:22px; right:24px; background:none; border:none; color:var(--muted-2); font-size:1.8rem; cursor:pointer; }
+
+  /* ══════════════════════════════════════════════════════════════
+     🎓 HERO DE CURSOS
+  ══════════════════════════════════════════════════════════════ */
+  .cursos-hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 120px 0 80px;
+    text-align: center;
+  }
+
+  /* Fondo con gradiente radial dorado */
+  .cursos-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 20%, rgba(200,169,110,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(200,169,110,0.04) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(200,169,110,0.04) 0%, transparent 55%);
+  }
+  .cursos-hero-bg::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  /* Canvas de partículas */
+  #particles-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+
+  .cursos-hero-content { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; padding: 0 28px; }
+
+  /* Label superior */
+  .academy-label {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-size: 0.72rem; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 24px;
+    opacity: 0; animation: riseIn .8s .2s forwards;
+  }
+  .academy-label::before, .academy-label::after {
+    content: ''; width: 28px; height: 1px; background: var(--gold);
+  }
+
+  /* Título principal */
+  .cursos-title {
+    font-family: var(--font-hero);
+    font-size: clamp(3.5rem, 10vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    margin-bottom: 28px;
+    opacity: 0; animation: riseIn .9s .3s forwards;
+  }
+  .cursos-title .acc { color: var(--gold); }
+  .cursos-title .line2 {
+    display: block;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold), #a07840);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Descripción */
+  .cursos-desc {
+    font-size: 1.05rem; font-weight: 300; color: var(--muted-2);
+    line-height: 1.85; max-width: 640px; margin: 0 auto 48px;
+    opacity: 0; animation: riseIn .9s .45s forwards;
+  }
+  .cursos-desc strong { color: var(--text); font-weight: 400; }
+
+  /* Stats rápidos */
+  .cursos-stats {
+    display: flex; justify-content: center; gap: 1px;
+    margin-bottom: 72px;
+    opacity: 0; animation: riseIn .9s .6s forwards;
+  }
+  .c-stat {
+    background: rgba(15,15,15,0.85); backdrop-filter: blur(12px);
+    border: 1px solid var(--border); padding: 16px 28px; text-align: center;
+  }
+  .c-stat strong { display: block; font-family: var(--font-hero); font-size: 1.8rem; color: var(--gold); line-height: 1; }
+  .c-stat span { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+  /* Flecha scroll */
+  .scroll-hint { display:flex; flex-direction:column; align-items:center; gap:8px; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); opacity:0; animation:riseIn 1s 1.2s forwards; }
+  .scroll-line { width:1px; height:36px; background:linear-gradient(var(--gold),transparent); animation:scrollBlink 2.2s infinite; }
+
+  /* ══════════════════════════════════════════════════════════════
+     🎓 GRID DE CURSOS
+  ══════════════════════════════════════════════════════════════ */
+  #cursos-grid {
+    padding: 0 0 120px;
+    position: relative; z-index: 2;
+  }
+
+  .cursos-grid-inner {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     ✨ CARD DE CURSO — el componente principal
+  ══════════════════════════════════════════════════════════════ */
+  .curso-card {
+    position: relative; overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 48px 44px;
+    cursor: pointer;
+    transition: border-color .4s ease, transform .4s ease, box-shadow .4s ease;
+    display: flex; flex-direction: column; gap: 20px;
+    min-height: 280px;
+  }
+
+  /* Borde superior dorado al hover */
+  .curso-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .curso-card:hover { border-color: rgba(200,169,110,0.35); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(200,169,110,0.07); }
+  .curso-card:hover::before { opacity: 1; }
+
+  /* Brillo que barre la card */
+  .curso-shine {
+    position: absolute; top: 0; left: -70%; width: 40%; height: 100%;
+    background: linear-gradient(105deg, transparent 30%, rgba(200,169,110,0.06) 50%, transparent 70%);
+    animation: shineSweepCard 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes shineSweepCard {
+    0%,100% { left: -70%; opacity: 0; }
+    30% { opacity: 1; }
+    70% { left: 130%; opacity: 0; }
+  }
+
+  /* Partículas flotantes en cada card */
+  .curso-sparks { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .c-spark {
+    position: absolute; width: 1.5px; height: 1.5px; background: var(--gold-light);
+    border-radius: 50%; opacity: 0;
+    animation: cSparkFloat var(--csd, 5s) var(--css, 0s) ease-in-out infinite;
+  }
+  @keyframes cSparkFloat {
+    0% { transform: translateY(0) scale(0); opacity: 0; }
+    20% { opacity: .7; }
+    80% { opacity: .3; }
+    100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
+  }
+
+  /* Número decorativo de fondo */
+  .curso-num-bg {
+    position: absolute; right: 28px; bottom: -10px;
+    font-family: var(--font-hero); font-size: 8rem; line-height: 1;
+    color: rgba(200,169,110,0.04);
+    pointer-events: none; user-select: none;
+    transition: color .4s ease;
+  }
+  .curso-card:hover .curso-num-bg { color: rgba(200,169,110,0.07); }
+
+  /* Ícono */
+  .curso-icon { font-size: 2.2rem; line-height: 1; }
+
+  /* Número visible */
+  .curso-num { font-family: var(--font-hero); font-size: .7rem; letter-spacing: .2em; color: var(--muted); }
+
+  /* Nombre del curso */
+  .curso-nombre {
+    font-family: var(--font-hero);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    letter-spacing: .03em; line-height: 1;
+    color: var(--text);
+    transition: color .3s ease;
+  }
+  .curso-card:hover .curso-nombre { color: var(--gold-light); }
+
+  /* Descripción */
+  .curso-desc { font-size: .9rem; color: var(--muted-2); line-height: 1.75; font-weight: 300; flex: 1; }
+
+  /* Footer de la card */
+  .curso-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 16px; border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .curso-proximamente {
+    font-family: var(--font-head); font-size: .68rem; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); display: flex; align-items: center; gap: 8px;
+  }
+  .curso-prox-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); opacity: .6;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .curso-cta {
+    font-family: var(--font-head); font-size: .68rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gold); display: flex; align-items: center; gap: 8px;
+    transition: gap var(--tr);
+  }
+  .curso-cta::after { content: '→'; }
+  .curso-card:hover .curso-cta { gap: 14px; }
+
+  /* ══════════════════════════════════════════════════════════════
+     🔔 MODAL "PRÓXIMAMENTE"
+  ══════════════════════════════════════════════════════════════ */
+  .prox-overlay {
+    display: none; position: fixed; inset: 0; z-index: 800;
+    background: rgba(7,7,7,0.92); backdrop-filter: blur(28px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .prox-overlay.open { display: flex; }
+
+  .prox-box {
+    background: var(--surface);
+    border: 1px solid rgba(200,169,110,0.3);
+    max-width: 520px; width: 100%;
+    padding: 52px 48px;
+    text-align: center;
+    position: relative;
+    animation: proxIn .35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    box-shadow: 0 0 80px rgba(200,169,110,0.1);
+  }
+  @keyframes proxIn { from{opacity:0;transform:scale(.92) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+  /* Línea dorada superior */
+  .prox-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .prox-close {
+    position: absolute; top: 16px; right: 18px;
+    background: none; border: none; color: var(--muted-2);
+    font-size: 1.3rem; cursor: pointer; transition: color var(--tr);
+  }
+  .prox-close:hover { color: var(--text); }
+
+  /* Ícono del modal */
+  .prox-icon { font-size: 2.8rem; margin-bottom: 20px; }
+
+  /* Título PRÓXIMAMENTE */
+  .prox-titulo {
+    font-family: var(--font-hero);
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+    letter-spacing: .04em; line-height: .95;
+    color: var(--gold); margin-bottom: 8px;
+  }
+
+  /* Nombre del curso en el modal */
+  .prox-curso {
+    font-family: var(--font-head); font-size: .8rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted-2); margin-bottom: 28px;
+  }
+
+  /* Divisor */
+  .prox-div { height: 1px; background: var(--border); margin: 28px 0; }
+
+  /* Texto del CTA */
+  .prox-cta-text {
+    font-size: 1rem; color: var(--text); font-weight: 300; line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .prox-cta-text strong { color: var(--gold); font-weight: 700; }
+
+  /* Botón de Instagram */
+  .prox-ig-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    width: 100%; padding: 16px 24px;
+    background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+    color: #fff; font-family: var(--font-head); font-size: .85rem;
+    font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    border: none; cursor: pointer;
+    transition: opacity var(--tr), transform var(--tr);
+    text-decoration: none;
+  }
+  .prox-ig-btn:hover { opacity: .9; transform: translateY(-2px); }
+  .prox-ig-btn svg { width: 20px; height: 20px; }
+
+  /* Texto final del modal */
+  .prox-nota {
+    font-size: .75rem; color: var(--muted); margin-top: 16px; line-height: 1.6;
+  }
+
+  /* ── Ticker en cursos ── */
+  .ticker { overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--surface); padding:14px 0; position:relative; z-index:2; margin-bottom:0; }
+  .ticker-track { display:flex; animation:tickerScroll 30s linear infinite; width:max-content; }
+  .ticker-item { display:flex; align-items:center; gap:18px; font-family:var(--font-hero); font-size:0.9rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); white-space:nowrap; padding:0 28px; }
+  .ticker-item .dot { width:5px; height:5px; background:var(--gold); border-radius:50%; flex-shrink:0; }
+
+  /* ── Footer ── */
+  .cursos-footer {
+    border-top: 1px solid var(--border); padding: 36px 0;
+  }
+  .cursos-footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+    max-width: var(--max-w); margin: 0 auto; padding: 0 28px;
+  }
+  .footer-copy  { font-size:.78rem; color:var(--muted); }
+  .footer-logo  { font-family:var(--font-hero); font-size:1.2rem; letter-spacing:.06em; color:var(--muted); }
+  .footer-logo span { color:var(--gold); }
+  .footer-back  { font-size:.72rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; transition:color var(--tr); }
+  .footer-back:hover { color:var(--gold); }
+
+  /* ── Reveal ── */
+  .reveal { opacity:0; transform:translateY(28px); transition:opacity .75s ease,transform .75s ease; }
+  .reveal.vis { opacity:1!important; transform:translateY(0)!important; }
+
+  /* ── Keyframes ── */
+  @keyframes riseIn      { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse       { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:.6} }
+  @keyframes scrollBlink { 0%,100%{opacity:1} 50%{opacity:.2} }
+  @keyframes tickerScroll{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* ── Responsive ── */
+  @media (max-width:900px) { .cursos-grid-inner { grid-template-columns: 1fr; } }
+  @media (max-width:768px) {
+    .nav-links,.nav-wa,.nav-portal { display:none; }
+    .hamburger { display:flex; }
+    .cursos-stats { flex-wrap:wrap; justify-content:center; }
+    .c-stat { flex:1; min-width:100px; }
+    .prox-box { padding: 40px 28px; }
+    .curso-card { padding: 36px 28px; min-height: 240px; }
+  }
+  </style>
+</head>
+<body>
+
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       🧭 NAVBAR
+  ════════════════════════════════════════════════════════════ -->
+  <nav id="navbar">
+    <div class="container nav-inner">
+      <a href="/" class="logo">EVRIC<span> </span>HUNTER</a>
+
+      <ul class="nav-links">
+        <li><a href="/#sobre">Sobre mí</a></li>
+        <li><a href="/#servicios">Servicios</a></li>
+        <li><a href="/#paquetes">Paquetes</a></li>
+        <li><a href="/#agenda">Agenda</a></li>
+        <li><a href="/#trabajos">Trabajos</a></li>
+        <li><a href="/#testimonios">Reviews</a></li>
+        <li><a href="/#contacto">Contacto</a></li>
+        <!-- ✏️  Cursos marcado como activo -->
+        <li><a href="/cursos" class="active" style="color:var(--gold)">Cursos</a></li>
+      </ul>
+
+      <a href="/artistas" class="nav-portal" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Portal de artistas
+      </a>
+
+      <a href="https://wa.me/5492804311371" class="nav-wa" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        WhatsApp
+      </a>
+
+      <button class="hamburger" onclick="toggleMenu()" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menú mobile -->
+  <div class="mobile-menu" id="mobMenu">
+    <button class="mob-close" onclick="toggleMenu()">✕</button>
+    <a href="/"           onclick="toggleMenu()">Inicio</a>
+    <a href="/#servicios" onclick="toggleMenu()">Servicios</a>
+    <a href="/#trabajos"  onclick="toggleMenu()">Trabajos</a>
+    <a href="/#contacto"  onclick="toggleMenu()">Contacto</a>
+    <a href="/cursos"     onclick="toggleMenu()" style="color:var(--gold)">Cursos</a>
+    <a href="/artistas"   style="font-size:1.4rem !important;color:var(--muted-2) !important;border:1px solid var(--border);padding:8px 24px">🔐 Portal</a>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       🎓 HERO
+  ════════════════════════════════════════════════════════════ -->
+  <section class="cursos-hero">
+    <canvas id="particles-canvas"></canvas>
+    <div class="cursos-hero-bg"></div>
+
+    <div class="cursos-hero-content">
+
+      <!-- ✏️  Label superior -->
+      <p class="academy-label">NoiseMakers Academy</p>
+
+      <!-- ✏️  Título — editá si querés cambiar el slogan -->
+      <h1 class="cursos-titulo">
+        CONVERTITE EN UN<br>
+        <span class="line2">NOISE MAKER.</span>
+      </h1>
+
+      <!-- ✏️  Descripción — optimizada para SEO y para impactar -->
+      <p class="cursos-desc">
+        En esta plataforma encontrarás los cursos con <strong>toda la data real</strong> de la industria musical.
+        Aprendé <strong>producción musical</strong>, <strong>procesamiento de voces</strong>,
+        <strong>mezcla y mastering profesional</strong> y <strong>playback en vivo</strong>
+        de la mano de alguien que lo hace todos los días con artistas reales.
+        Sin filtros. Sin teoría vacía. Solo lo que funciona.
+      </p>
+
+      <!-- Stats -->
+      <div class="cursos-stats">
+        <div class="c-stat"><strong>10+</strong><span>Años de experiencia</span></div>
+        <div class="c-stat"><strong>100+</strong><span>Artistas producidos</span></div>
+        <div class="c-stat"><strong>3M+</strong><span>Streams acumulados</span></div>
+        <div class="c-stat"><strong>4</strong><span>Cursos en camino</span></div>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="scroll-hint">
+        <div class="scroll-line"></div>
+        Ver cursos
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Ticker ── -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="ticker-item"><span class="dot"></span>PRODUCCIÓN MUSICAL</span>
+      <span class="ticker-item"><span class="dot"></span>PROCESAMIENTO DE VOCES</span>
+      <span class="ticker-item"><span class="dot"></span>MEZCLA Y MASTERING</span>
+      <span class="ticker-item"><span class="dot"></span>PLAYBACK EN VIVO</span>
+      <span class="ticker-item"><span class="dot"></span>NOISE MAKERS ACADEMY</span>
+      <span class="ticker-item"><span class="dot"></span>EVRIC HUNTER</span>
+      <span class="ticker-item"><span class="dot"></span>BUENOS AIRES</span>
+      <span class="ticker-item"><span class="dot"></span>INDUSTRIA MUSICAL</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       📚 GRID DE CURSOS
+       ✏️  Para cada .curso-card editá:
+           - .curso-icon → emoji del curso
+           - .curso-nombre → nombre del curso
+           - .curso-desc → descripción breve
+           - data-curso en el div → nombre que aparece en el modal
+           - El href del botón de Instagram del modal está al final en el JS
+  ════════════════════════════════════════════════════════════ -->
+  <section id="cursos-grid">
+    <div class="cursos-grid-inner">
+
+      <!-- ════════ ✏️  CURSO 1 — Producción Musical ════════ -->
+      <div class="curso-card reveal" data-curso="Curso de Producción Musical" onclick="abrirModal(this)">
+        <div class="curso-shine"></div>
+        <div class="curso-sparks" id="sparks-1"></div>
+        <div class="curso-num-bg">01</div>
+
+        <div class="curso-icon">🎹</div>
+        <p class="curso-num">Curso 01</p>
+
+        <!-- ✏️  Nombre del curso -->
+        <h2 class="curso-nombre">PRODUCCIÓN MUSICAL</h2>
+
+        <!-- ✏️  Descripción del curso -->
+        <p class="curso-desc">
+          Desde cero hasta un tema listo para plataformas. Beatmaking, arreglos, estructura comercial,
+          referencias y flujo de trabajo real en el estudio. Para artistas que quieren dejar de depender
+          de otros y productores que quieren dar el salto a otro nivel.
+        </p>
+
+        <div class="curso-footer">
+          <div class="curso-proximamente">
+            <div class="curso-prox-dot"></div>
+            Próximamente
+          </div>
+          <div class="curso-cta">Anotarme</div>
+        </div>
+      </div>
+
+      <!-- ════════ ✏️  CURSO 2 — Procesamiento de Voces ════════ -->
+      <div class="curso-card reveal" data-curso="Curso de Procesamiento de Voces" onclick="abrirModal(this)" style="transition-delay:.1s">
+        <div class="curso-shine"></div>
+        <div class="curso-sparks" id="sparks-2"></div>
+        <div class="curso-num-bg">02</div>
+
+        <div class="curso-icon">🎙️</div>
+        <p class="curso-num">Curso 02</p>
+
+        <!-- ✏️  Nombre del curso -->
+        <h2 class="curso-nombre">PROCESAMIENTO DE VOCES</h2>
+
+        <!-- ✏️  Descripción del curso -->
+        <p class="curso-desc">
+          El secreto que diferencia una canción casera de una producción profesional.
+          Afinación, compresión, saturación, reverb, delay y el chain completo que uso en cada sesión.
+          Aplicado a cumbia, trap, pop y cualquier género que trabajes.
+        </p>
+
+        <div class="curso-footer">
+          <div class="curso-proximamente">
+            <div class="curso-prox-dot"></div>
+            Próximamente
+          </div>
+          <div class="curso-cta">Anotarme</div>
+        </div>
+      </div>
+
+      <!-- ════════ ✏️  CURSO 3 — Mezcla y Mastering ════════ -->
+      <div class="curso-card reveal" data-curso="Curso de Mezcla y Mastering" onclick="abrirModal(this)" style="transition-delay:.18s">
+        <div class="curso-shine"></div>
+        <div class="curso-sparks" id="sparks-3"></div>
+        <div class="curso-num-bg">03</div>
+
+        <div class="curso-icon">🎚️</div>
+        <p class="curso-num">Curso 03</p>
+
+        <!-- ✏️  Nombre del curso -->
+        <h2 class="curso-nombre">MEZCLA Y MASTERING</h2>
+
+        <!-- ✏️  Descripción del curso -->
+        <p class="curso-desc">
+          Hacé que tu canción suene en Spotify como lo que es: una producción de nivel.
+          Mezcla en profundidad, mastering para streaming, loudness, stems y entregables.
+          El proceso completo que usé en más de 200 producciones.
+        </p>
+
+        <div class="curso-footer">
+          <div class="curso-proximamente">
+            <div class="curso-prox-dot"></div>
+            Próximamente
+          </div>
+          <div class="curso-cta">Anotarme</div>
+        </div>
+      </div>
+
+      <!-- ════════ ✏️  CURSO 4 — Playback en Vivo ════════ -->
+      <div class="curso-card reveal" data-curso="Curso de Playback y Procesamiento en Vivo" onclick="abrirModal(this)" style="transition-delay:.26s">
+        <div class="curso-shine"></div>
+        <div class="curso-sparks" id="sparks-4"></div>
+        <div class="curso-num-bg">04</div>
+
+        <div class="curso-icon">🎤</div>
+        <p class="curso-num">Curso 04</p>
+
+        <!-- ✏️  Nombre del curso -->
+        <h2 class="curso-nombre">PLAYBACK Y PROC. EN VIVO</h2>
+
+        <!-- ✏️  Descripción del curso -->
+        <p class="curso-desc">
+          Operación de playback, efectos en tiempo real y procesamiento de voz para shows.
+          Trabajé en escenarios como el Movistar Arena, Estadio de Huracán y más.
+          Todo lo que necesitás saber para trabajar con artistas en vivo.
+        </p>
+
+        <div class="curso-footer">
+          <div class="curso-proximamente">
+            <div class="curso-prox-dot"></div>
+            Próximamente
+          </div>
+          <div class="curso-cta">Anotarme</div>
+        </div>
+      </div>
+
+      <!-- ✏️  Para agregar más cursos: copiá un bloque .curso-card de arriba -->
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       🔔 MODAL PRÓXIMAMENTE
+       ✏️  Para editar el link de Instagram: buscá prox-ig-btn más abajo
+  ════════════════════════════════════════════════════════════ -->
+  <div class="prox-overlay" id="proxModal">
+    <div class="prox-box">
+      <button class="prox-close" onclick="cerrarModal()">✕</button>
+
+      <div class="prox-icon">🔊</div>
+
+      <h2 class="prox-titulo">PRÓXIMAMENTE</h2>
+
+      <!-- El nombre del curso se inserta dinámicamente -->
+      <p class="prox-curso" id="proxCursoNombre">Curso de Producción Musical</p>
+
+      <div class="prox-div"></div>
+
+      <p class="prox-cta-text">
+        Este curso está en desarrollo.<br>
+        <strong>Guardá tu cupo sin cargo</strong> y te aviso en cuanto esté disponible.<br>
+        Solo necesito que me mandes un mensaje por Instagram.
+      </p>
+
+      <!-- ✏️  Reemplazá el href con tu Instagram real -->
+      <a
+        href="https://instagram.com/evrichunter"
+        class="prox-ig-btn"
+        target="_blank"
+        id="proxIgBtn"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+        Guardar mi cupo por Instagram
+      </a>
+
+      <p class="prox-nota">Sin cargo · Sin tarjeta · Solo un mensaje</p>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="cursos-footer">
+    <div class="cursos-footer-inner">
+      <p class="footer-copy">© 2026 EVRIC HUNTER · NoiseMakers Academy</p>
+      <span class="footer-logo">EVRIC<span> </span>HUNTER</span>
+      <a href="/" class="footer-back">← Volver al inicio</a>
+    </div>
+  </footer>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ⚙️  JAVASCRIPT
+  ════════════════════════════════════════════════════════════ -->
+  <script>
+
+  /* ── Cursor ── */
+  const dot = document.getElementById('cur-dot'), ring = document.getElementById('cur-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
+  (function animRing(){ rx+=(mx-rx)*.11; ry+=(my-ry)*.11; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ dot.style.width=dot.style.height='18px'; ring.style.width=ring.style.height='52px'; });
+    el.addEventListener('mouseleave',()=>{ dot.style.width=dot.style.height='8px'; ring.style.width=ring.style.height='34px'; });
+  });
+
+  /* ── Navbar scroll ── */
+  window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',scrollY>60));
+
+  /* ── Menú mobile ── */
+  function toggleMenu(){ document.getElementById('mobMenu').classList.toggle('open'); }
+
+  /* ── Reveal on scroll ── */
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vis'); obs.unobserve(e.target); } });
+  },{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  /* ── Ticker loop ── */
+  const tt=document.getElementById('tickerTrack'); if(tt) tt.innerHTML+=tt.innerHTML;
+
+  /* ── Partículas de fondo ── */
+  (function(){
+    const canvas=document.getElementById('particles-canvas'); if(!canvas) return;
+    const ctx=canvas.getContext('2d'); let W,H,pts=[];
+    function resize(){ W=canvas.width=canvas.parentElement.offsetWidth; H=canvas.height=canvas.parentElement.offsetHeight; }
+    resize(); window.addEventListener('resize',resize);
+    for(let i=0;i<50;i++) pts.push({x:Math.random()*1400,y:Math.random()*900,r:Math.random()*1.2+.2,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,a:Math.random()*.45+.1});
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=`rgba(200,169,110,${p.a})`; ctx.fill(); });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  /* ── Destellos en cada curso card ── */
+  ['sparks-1','sparks-2','sparks-3','sparks-4'].forEach((id,ci) => {
+    const c = document.getElementById(id); if(!c) return;
+    for(let i=0;i<6;i++){
+      const s = document.createElement('div');
+      s.className = 'c-spark';
+      s.style.cssText = `
+        left:${10+Math.random()*80}%;
+        top:${20+Math.random()*60}%;
+        --csd:${(3+Math.random()*4).toFixed(1)}s;
+        --css:${(ci*0.5+Math.random()*3).toFixed(1)}s;
+      `;
+      c.appendChild(s);
+    }
+  });
+
+  /* ════════════════════════════════════════════════════════
+     🔔 MODAL PRÓXIMAMENTE
+     ✏️  Para personalizar el link de Instagram por curso:
+         editá el objeto instagramLinks abajo
+  ════════════════════════════════════════════════════════ */
+  const instagramLinks = {
+    /* ✏️  Reemplazá con tu Instagram y el texto del mensaje por curso */
+    'Curso de Producción Musical':
+      'https://instagram.com/evrichunter',
+    'Curso de Procesamiento de Voces':
+      'https://instagram.com/evrichunter',
+    'Curso de Mezcla y Mastering':
+      'https://instagram.com/evrichunter',
+    'Curso de Playback y Procesamiento en Vivo':
+      'https://instagram.com/evrichunter',
+  };
+
+  function abrirModal(card) {
+    const curso = card.dataset.curso;
+    document.getElementById('proxCursoNombre').textContent = curso;
+    document.getElementById('proxIgBtn').href = instagramLinks[curso] || 'https://instagram.com/evrichunter';
+    document.getElementById('proxModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModal() {
+    document.getElementById('proxModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* Cerrar al clickear fuera */
+  document.getElementById('proxModal').addEventListener('click', function(e){
+    if(e.target === this) cerrarModal();
+  });
+
+  /* Cerrar con ESC */
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') cerrarModal(); });
+
+  </script>
+
+</body>
+</html>
