@@ -561,13 +561,149 @@
   #toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid rgba(200,169,110,.3); color:var(--text); padding:10px 20px; font-size:.78rem; letter-spacing:.06em; z-index:1000; opacity:0; transition:opacity .3s; pointer-events:none; }
   #toast.show { opacity:1; }
 
+  /* Toast mobile-aware */
+  #toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid rgba(200,169,110,.3); color:var(--text); padding:10px 20px; font-size:.78rem; letter-spacing:.06em; z-index:1000; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
+  #toast.show { opacity:1; }
+
+  /* ══════════════════════════════════════════
+     📱 BOTTOM NAV — solo mobile
+  ══════════════════════════════════════════ */
+  .bottom-nav {
+    display:none; position:fixed; bottom:0; left:0; right:0; z-index:600;
+    background:rgba(10,10,10,.96); backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .bottom-nav-inner { display:flex; }
+  .bnav-btn {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; padding:10px 4px 8px; border:none; background:none; cursor:pointer;
+    color:var(--muted-2); transition:color var(--tr);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .bnav-btn.active { color:var(--gold); }
+  .bnav-btn .bnav-icon { font-size:1.25rem; line-height:1; }
+  .bnav-btn .bnav-label { font-size:.55rem; letter-spacing:.1em; text-transform:uppercase; font-family:var(--font-head); font-weight:700; }
+
+  /* ══════════════════════════════════════════
+     📱 BOTTOM SHEET — panel del día en mobile
+  ══════════════════════════════════════════ */
+  .bottom-sheet-overlay {
+    display:none; position:fixed; inset:0; z-index:700;
+    background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+  }
+  .bottom-sheet-overlay.open { display:block; }
+
+  /* ══════════════════════════════════════════
+     📱 RESPONSIVE — 900px
+  ══════════════════════════════════════════ */
   @media (max-width:900px) {
     .sidebar { display:none; }
     .day-panel { width:300px; }
+    .g-stats-row { grid-template-columns:repeat(2,1fr); }
+    .g-row-3 { grid-template-columns:1fr; }
   }
-  @media (max-width:640px) {
-    .day-panel { position:fixed; inset:0; width:100%; z-index:700; }
-    #ai-chat-panel { width:calc(100vw - 32px); right:16px; }
+
+  /* ══════════════════════════════════════════
+     📱 RESPONSIVE — iPhone 11 Pro y similares (≤430px)
+     Optimizado para 390×844 con safe areas
+  ══════════════════════════════════════════ */
+  @media (max-width:430px) {
+
+    /* Body ocupa todo */
+    body { overflow:hidden; }
+
+    /* Header compacto */
+    .app-header {
+      padding:10px 16px;
+      padding-top:calc(env(safe-area-inset-top) + 10px);
+    }
+    .app-logo { font-size:1.1rem; }
+    .app-tabs { display:none; } /* tabs reemplazados por bottom nav */
+    .header-actions { display:none; } /* acciones en bottom nav */
+
+    /* Vista agenda: sin sidebar, sin panel lateral */
+    #vistaAgenda { flex-direction:column; }
+    .sidebar { display:none !important; }
+    .app-body { flex-direction:column; }
+
+    /* Calendario ocupa todo el ancho */
+    .main-cal { flex:1; }
+    .cal-topbar { padding:12px 14px; }
+    .cal-month-display { font-size:1.4rem; }
+    .cal-week-header span { font-size:.55rem; padding:7px 0; }
+    .cal-cell { min-height:72px; padding:5px; gap:2px; }
+    .cal-day-num { font-size:.75rem; }
+    .cal-chip { font-size:.52rem; padding:2px 5px; }
+    .cal-cell-info { font-size:.58rem; }
+
+    /* Panel del día como BOTTOM SHEET */
+    .day-panel {
+      position:fixed !important;
+      left:0 !important; right:0 !important;
+      bottom:0 !important; top:auto !important;
+      width:100% !important;
+      max-height:82vh;
+      border-left:none !important;
+      border-top:1px solid rgba(200,169,110,.25) !important;
+      border-radius:18px 18px 0 0;
+      z-index:710;
+      transform:translateY(100%);
+      transition:transform .3s cubic-bezier(.34,1.1,.64,1) !important;
+      animation:none !important;
+      padding-bottom:calc(env(safe-area-inset-bottom) + 72px);
+      overflow-y:auto;
+    }
+    .day-panel:not(.hidden) {
+      transform:translateY(0) !important;
+    }
+    .day-panel.hidden { transform:translateY(100%) !important; }
+
+    /* Handle drag visual */
+    .day-panel-header::before {
+      content:''; display:block; width:36px; height:4px;
+      background:var(--border); border-radius:2px;
+      margin:0 auto 12px; position:absolute;
+      top:10px; left:50%; transform:translateX(-50%);
+    }
+    .day-panel-header { padding-top:28px; padding-bottom:12px; }
+
+    /* Botones más grandes para touch */
+    .tipo-btn { padding:14px 8px; font-size:.68rem; }
+    .panel-input, .panel-select, .panel-textarea { padding:12px 14px; font-size:.9rem; }
+    .panel-section-title { font-size:.72rem; letter-spacing:.14em; }
+    .panel-save-btn { padding:16px; font-size:.82rem; }
+    .panel-cancel-btn { padding:16px 12px; font-size:.68rem; }
+
+    /* Ganancias mobile */
+    .ganancias-view { padding:16px 14px; padding-bottom:calc(env(safe-area-inset-bottom) + 80px); }
+    .g-stats-row { grid-template-columns:repeat(2,1fr); gap:8px; }
+    .g-stat-card { padding:14px 14px; }
+    .g-stat-value { font-size:1.5rem; }
+    .g-stat-label { font-size:.58rem; }
+    .g-row-2, .g-row-3 { grid-template-columns:1fr; }
+    .g-panel { padding:14px 14px; }
+    .g-period-btns { gap:3px; }
+    .g-period-btn { padding:6px 10px; font-size:.6rem; }
+
+    /* Toast arriba del bottom nav */
+    #toast { bottom:calc(72px + env(safe-area-inset-bottom) + 10px); }
+
+    /* AI FAB arriba del bottom nav */
+    #ai-fab { bottom:calc(72px + env(safe-area-inset-bottom) + 12px); right:14px; width:48px; height:48px; font-size:1.1rem; }
+    #ai-chat-panel { bottom:calc(72px + env(safe-area-inset-bottom) + 70px); width:calc(100vw - 24px); right:12px; max-height:55vh; }
+
+    /* Bottom nav visible */
+    .bottom-nav { display:block; }
+
+    /* Header de ganancias mobile */
+    #vistaGanancias > div:first-child { flex-direction:column; gap:12px; align-items:flex-start; }
+  }
+
+  /* iPhone 11 Pro landscape */
+  @media (max-width:844px) and (orientation:landscape) {
+    .day-panel { max-height:95vh; }
+    .cal-cell { min-height:55px; }
   }
   </style>
 </head>
@@ -888,6 +1024,37 @@
 <!-- Toast -->
 <div id="toast"></div>
 
+<!-- Bottom sheet overlay (mobile) -->
+<div class="bottom-sheet-overlay" id="bsOverlay" onclick="cerrarPanel()"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     📱 BOTTOM NAVIGATION — solo mobile
+══════════════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" id="bnavAgenda" onclick="switchTab('agenda')">
+      <span class="bnav-icon">📅</span>
+      <span class="bnav-label">Agenda</span>
+    </button>
+    <button class="bnav-btn" id="bnavGanancias" onclick="switchTab('ganancias')">
+      <span class="bnav-icon">💰</span>
+      <span class="bnav-label">Ganancias</span>
+    </button>
+    <button class="bnav-btn" id="bnavProyectos" onclick="abrirProyectos()">
+      <span class="bnav-icon">📋</span>
+      <span class="bnav-label">Proyectos</span>
+    </button>
+    <button class="bnav-btn" id="bnavIA" onclick="toggleChat()">
+      <span class="bnav-icon">🤖</span>
+      <span class="bnav-label">Asistente</span>
+    </button>
+    <button class="bnav-btn" onclick="abrirConfigHorarios()">
+      <span class="bnav-icon">⚙️</span>
+      <span class="bnav-label">Config</span>
+    </button>
+  </div>
+</nav>
+
 <!-- ══════════════════════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════════════════════ -->
@@ -896,15 +1063,18 @@
 /* ══════════════════════════════════════════════════════
    💾 STORAGE — usa localStorage (archivo en GitHub Pages)
 ══════════════════════════════════════════════════════ */
-const STORAGE_KEY = 'evric_agenda_v1';
-const STORAGE_PROY = 'evric_proyectos_v1';
-const STORAGE_HORA = 'evric_horarios_v1';
+const STORAGE_KEY    = 'evric_agenda_v1';
+const STORAGE_PROY   = 'evric_proyectos_v1';
+const STORAGE_HORA   = 'evric_horarios_v1';
+const STORAGE_SYNC   = 'evric_cal_sync_v1'; // ← clave compartida con index.html
 
 function cargarDatos() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
 }
 function guardarDatos(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  // Sincronizar con el calendario de index.html
+  sincronizarConIndex(data);
 }
 function cargarHorarios() {
   try {
@@ -1139,6 +1309,7 @@ function abrirDia(key, dia) {
 
   // Mostrar panel
   document.getElementById('dayPanel').classList.remove('hidden');
+  mostrarOverlayMobile();
   renderCal();
 }
 
@@ -1985,8 +2156,73 @@ function renderGanancias() {
 }
 
 /* ══════════════════════════════════════════════════════
+   🔗 SINCRONIZACIÓN CON INDEX.HTML
+   Cuando guardás un día ocupado en la agenda, el calendario
+   de la página principal lo muestra automáticamente en rojo.
+══════════════════════════════════════════════════════ */
+function sincronizarConIndex(agendaData) {
+  // Construye el objeto DISPONIBILIDAD que lee index.html
+  const sync = {};
+  Object.entries(agendaData).forEach(([key, val]) => {
+    if (!val || !val.tipo) return;
+    // Solo las sesiones y trabajo solitario se marcan como ocupado
+    // El tipo 'content' también ocupa el día
+    sync[key] = 'ocupado';
+  });
+  localStorage.setItem(STORAGE_SYNC, JSON.stringify(sync));
+}
+
+/* ══════════════════════════════════════════════════════
+   📱 MOBILE — overlay y tabs bottom nav
+══════════════════════════════════════════════════════ */
+const isMobile = () => window.innerWidth <= 430;
+
+// Override cerrarPanel para mobile (ocultar overlay)
+const _cerrarPanelOriginal = cerrarPanel;
+function cerrarPanel() {
+  if (isMobile()) {
+    document.getElementById('bsOverlay').classList.remove('open');
+  }
+  document.getElementById('dayPanel').classList.add('hidden');
+  estado.diaSeleccionado = null;
+  renderCal();
+}
+
+// Override abrirDia para mostrar overlay en mobile
+const _abrirDiaOriginal = abrirDia;
+
+// Patch: mostrar overlay al abrir panel en mobile
+function mostrarOverlayMobile() {
+  if (isMobile()) {
+    document.getElementById('bsOverlay').classList.add('open');
+  }
+}
+
+// Sincronizar bottom nav con tabs
+const _switchTabOriginal = switchTab;
+function switchTab(tab) {
+  tabActivo = tab;
+  document.getElementById('vistaAgenda').style.display    = tab === 'agenda'    ? 'flex'  : 'none';
+  document.getElementById('vistaGanancias').classList.toggle('active', tab === 'ganancias');
+  document.getElementById('tabAgenda').classList.toggle('active',    tab === 'agenda');
+  document.getElementById('tabGanancias').classList.toggle('active', tab === 'ganancias');
+  // Bottom nav
+  ['bnavAgenda','bnavGanancias'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  if (tab === 'agenda' && document.getElementById('bnavAgenda'))
+    document.getElementById('bnavAgenda').classList.add('active');
+  if (tab === 'ganancias' && document.getElementById('bnavGanancias'))
+    document.getElementById('bnavGanancias').classList.add('active');
+  if (tab === 'ganancias') renderGanancias();
+}
+
+/* ══════════════════════════════════════════════════════
    🚀 INIT
 ══════════════════════════════════════════════════════ */
+// Cargar sync inicial
+sincronizarConIndex(estado.agenda);
 renderCal();
 
 </script>
