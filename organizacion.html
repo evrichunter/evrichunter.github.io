@@ -2,8 +2,34 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Evric Hunter — Organización de Estudio</title>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp }                        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, set, onValue, off } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  const cfg = {
+    apiKey:            "AIzaSyDWE64UYQMQFKT0nreF7ax59gzI2OsIVmE",
+    authDomain:        "evric-agenda.firebaseapp.com",
+    databaseURL:       "https://evric-agenda-default-rtdb.firebaseio.com",
+    projectId:         "evric-agenda",
+    storageBucket:     "evric-agenda.firebasestorage.app",
+    messagingSenderId: "239254402707",
+    appId:             "1:239254402707:web:bda9f7ae205b14cb81bf66"
+  };
+  const app = initializeApp(cfg);
+  const db  = getDatabase(app);
+  window._fbRef   = (path) => ref(db, path);
+  window._fbSet   = set;
+  window._fbOn    = onValue;
+  window._fbOff   = off;
+  window._fbListo = true;
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -12,11 +38,40 @@
   --text:#ede8e0;--sec:#888882;--muted:#555550;
   --red:#c0392b;--green:#27ae60;
   --r:10px;--rs:6px;--t:.16s ease;
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;font-size:14px;min-height:100vh;line-height:1.5}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans','Segoe UI',system-ui,sans-serif;
+  font-size:14px;min-height:100vh;line-height:1.5;
+  padding-top:var(--safe-top);
+  -webkit-tap-highlight-color:transparent;
+  -webkit-text-size-adjust:100%;
+}
+
+/* SYNC INDICATOR */
+.sync-bar{
+  position:fixed;top:calc(var(--safe-top) + 8px);right:14px;
+  z-index:200;display:flex;align-items:center;gap:6px;
+  background:rgba(10,10,10,.85);border:1px solid #222;
+  border-radius:20px;padding:4px 10px;font-size:10px;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--sec);
+  pointer-events:none;
+}
+.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--muted);}
+.sync-dot.online {background:#27ae60;animation:pulse 2s infinite;}
+.sync-dot.offline{background:#c0392b;}
+.sync-dot.syncing{background:var(--gold);animation:spin .8s linear infinite;border-radius:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:var(--surface);border-bottom:1px solid #1c1c1c;position:sticky;top:0;z-index:100}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 32px;background:var(--surface);border-bottom:1px solid #1c1c1c;
+  position:sticky;top:0;z-index:100;
+}
 .logo{display:flex;align-items:center;gap:14px;text-decoration:none}
 .logo img{height:36px;width:auto;display:block;filter:brightness(1)}
 .logo-sub{font-size:11px;letter-spacing:2px;color:var(--sec);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;text-transform:uppercase}
@@ -25,7 +80,7 @@ nav{display:flex;gap:6px}
 .nav-btn:hover,.nav-btn.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700}
 
 /* LAYOUT */
-main{max-width:1280px;margin:0 auto;padding:28px 24px}
+main{max-width:1280px;margin:0 auto;padding:28px 24px;padding-bottom:calc(28px + var(--safe-bottom))}
 .sec{display:none}.sec.active{display:block}
 .sec-title{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:22px;display:flex;align-items:center;gap:12px}
 .sec-title::after{content:'';flex:1;height:1px;background:#1c1c1c}
@@ -92,7 +147,7 @@ tr:hover td{background:var(--s2)}
 .ev-pill:hover{filter:brightness(1.2)}
 
 /* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);z-index:1000;display:none;align-items:center;justify-content:center}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
 .modal{background:var(--surface);border:1px solid #222;border-radius:var(--r);padding:28px;width:420px;max-width:95vw}
 .modal-ttl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
@@ -117,9 +172,52 @@ tr:hover td{background:var(--s2)}
 .sub-chip{font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid;cursor:pointer;font-weight:600;letter-spacing:.3px;transition:var(--t);user-select:none}
 .sub-chip.off{border-color:rgba(192,57,43,.45);color:var(--red);background:rgba(192,57,43,.08)}
 .sub-chip.on{border-color:rgba(39,174,96,.45);color:var(--green);background:rgba(39,174,96,.1)}
+
+/* ─── MOBILE iPhone 11 Pro (≤430px) ───────────────────────── */
+@media (max-width:430px){
+  header{padding:12px 16px;gap:8px}
+  .logo img{height:28px}
+  .logo-sub{font-size:9px;letter-spacing:1px}
+  nav{gap:4px}
+  .nav-btn{padding:6px 11px;font-size:10px;letter-spacing:1px}
+  main{padding:16px 14px;padding-bottom:calc(20px + var(--safe-bottom))}
+  .card{padding:14px}
+  /* Form contable: stack en móvil */
+  .g5{grid-template-columns:1fr 1fr}
+  .g5 > div:nth-child(3){grid-column:1/-1}
+  .g5 > div:nth-child(4){grid-column:1/-1}
+  .g5 > div:nth-child(5){grid-column:1/-1}
+  .gc3{grid-template-columns:1fr 1fr}
+  .gc3 > div:last-child{grid-column:1/-1}
+  /* Calendario: celdas más pequeñas */
+  .day-cell{min-height:52px;padding:4px}
+  .day-num{font-size:11px}
+  .ev-pill{font-size:8px;padding:1px 3px}
+  .day-lbl{font-size:9px;padding:5px 0}
+  /* Modal full-width en móvil */
+  .modal{padding:20px 16px}
+  .modal-foot{flex-wrap:wrap}
+  /* Chips subtarea más grandes para touch */
+  .sub-chip{padding:6px 12px;font-size:11px}
+  /* Inputs más grandes para touch */
+  input,select{min-height:44px}
+  .btn{min-height:44px;justify-content:center}
+  /* Totals en 2 cols */
+  .totals{gap:8px}
+  .chip{min-width:calc(50% - 4px);padding:10px 14px}
+  .chip .val{font-size:16px}
+  /* Ocultar sync en móvil si molesta */
+  .sync-bar{top:calc(var(--safe-top) + 4px);right:8px;font-size:9px;padding:3px 8px}
+}
 </style>
 </head>
 <body>
+
+<!-- Sync indicator -->
+<div class="sync-bar" id="sync-bar" style="display:none">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-label">Conectando...</span>
+</div>
 
 <header>
   <a href="https://evrichunter.com" class="logo">
@@ -249,9 +347,9 @@ tr:hover td{background:var(--s2)}
 </div>
 
 <script>
-/* ───────────────────────────────────────────────────────────────
-   STORAGE
-─────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   STORAGE LOCAL (fallback offline)
+═══════════════════════════════════════════════════════════════ */
 const LS = {
   get(k, def) {
     try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; }
@@ -260,56 +358,133 @@ const LS = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
 
-/* ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
+   FIREBASE SYNC
+   - Nodo: organizador/
+   - Guarda todo el estado en un solo objeto
+   - Debounce 800ms para no saturar escrituras
+═══════════════════════════════════════════════════════════════ */
+var fbListener   = null;
+var syncTimeout  = null;
+var fbListening  = false;
+
+function setSyncStatus(estado) {
+  var bar   = document.getElementById('sync-bar');
+  var dot   = document.getElementById('sync-dot');
+  var label = document.getElementById('sync-label');
+  if (!bar) return;
+  bar.style.display = 'flex';
+  dot.className = 'sync-dot ' + estado;
+  label.textContent = estado === 'online' ? 'Sincronizado' : estado === 'syncing' ? 'Guardando...' : 'Sin conexión';
+}
+
+function fbPath() { return 'organizador'; }
+
+function conectarFirebase() {
+  if (!window._fbListo || fbListening) return;
+  fbListening = true;
+  setSyncStatus('syncing');
+
+  fbListener = window._fbOn(window._fbRef(fbPath()), function(snapshot) {
+    var data = snapshot.val();
+    if (data) {
+      /* Solo aplicar si los datos remotos son más nuevos */
+      if (!data.ts || data.ts > (LS.get('org_ts', 0))) {
+        if (data.mov       !== undefined) { movimientos = data.mov;       LS.set('mov',       movimientos); }
+        if (data.cats      !== undefined) { categorias  = data.cats;      LS.set('cats',      categorias);  }
+        if (data.eventos   !== undefined) { eventos     = data.eventos;   LS.set('eventos',   eventos);     }
+        if (data.tareas    !== undefined) { tareas      = data.tareas;    LS.set('tareas',    tareas);      }
+        if (data.ts        !== undefined) { LS.set('org_ts', data.ts); }
+        /* Re-renderizar con datos frescos */
+        renderCats();
+        renderMov();
+        renderTasks();
+        renderCal();
+      }
+    }
+    setSyncStatus('online');
+  }, function(err) {
+    console.warn('Firebase error:', err);
+    setSyncStatus('offline');
+  });
+}
+
+function guardarEnFirebase() {
+  if (!window._fbListo) return;
+  setSyncStatus('syncing');
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(function() {
+    var ts = Date.now();
+    LS.set('org_ts', ts);
+    window._fbSet(window._fbRef(fbPath()), {
+      mov:     movimientos,
+      cats:    categorias,
+      eventos: eventos,
+      tareas:  tareas,
+      ts:      ts
+    }).then(function() {
+      setSyncStatus('online');
+    }).catch(function(e) {
+      console.warn('Firebase write error:', e);
+      setSyncStatus('offline');
+    });
+  }, 800);
+}
+
+/* Conectar cuando Firebase esté listo */
+if (window._fbListo) {
+  conectarFirebase();
+} else {
+  window.addEventListener('firebase-ready', conectarFirebase, { once: true });
+}
+
+/* ═══════════════════════════════════════════════════════════════
    NAV
-─────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 function showSec(id) {
-  document.querySelectorAll('.sec').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sec').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('s-' + id).classList.add('active');
   document.querySelector('.nav-btn[data-sec="' + id + '"]').classList.add('active');
   if (id === 'agenda') renderCal();
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    CONTABLE
-─────────────────────────────────────────────────────────────── */
-let movimientos = LS.get('mov', [
-  { id: 1, fecha: '2026-05-01', tipo: 'ingreso', cat: 'Mezcla',   desc: 'Mezcla Flor Vigna', monto: 180000 },
-  { id: 2, fecha: '2026-05-02', tipo: 'egreso',  cat: 'Insumos',  desc: 'Cables XLR',        monto: 12000  }
+═══════════════════════════════════════════════════════════════ */
+var movimientos = LS.get('mov', [
+  { id: 1, fecha: '2026-05-01', tipo: 'ingreso', cat: 'Mezcla',  desc: 'Mezcla Flor Vigna', monto: 180000 },
+  { id: 2, fecha: '2026-05-02', tipo: 'egreso',  cat: 'Insumos', desc: 'Cables XLR',         monto: 12000  }
 ]);
-let categorias = LS.get('cats', ['Mezcla','Mastering','Beat','Sesión','Insumos','Suscripciones','Varios']);
+var categorias = LS.get('cats', ['Mezcla','Mastering','Beat','Sesión','Insumos','Suscripciones','Varios']);
 
-function saveMov()  { LS.set('mov', movimientos); }
-function saveCats() { LS.set('cats', categorias); }
+function saveMov()  { LS.set('mov', movimientos);   guardarEnFirebase(); }
+function saveCats() { LS.set('cats', categorias);   guardarEnFirebase(); }
 
 function renderCats() {
-  const sel = document.getElementById('c-cat');
-  sel.innerHTML = categorias.map(c => '<option>' + c + '</option>').join('');
+  var sel = document.getElementById('c-cat');
+  sel.innerHTML = categorias.map(function(c) { return '<option>' + c + '</option>'; }).join('');
   document.getElementById('cats-row').innerHTML = categorias.map(function(c, i) {
     return '<div class="cat-tag">' + c + '<span class="rm" onclick="removeCat(' + i + ')">×</span></div>';
   }).join('');
 }
 
 function addCat() {
-  const inp = document.getElementById('new-cat');
-  const v = inp.value.trim();
+  var inp = document.getElementById('new-cat');
+  var v   = inp.value.trim();
   if (!v || categorias.includes(v)) return;
   categorias.push(v);
   saveCats(); renderCats(); inp.value = '';
 }
 
-function removeCat(i) {
-  categorias.splice(i, 1);
-  saveCats(); renderCats();
-}
+function removeCat(i) { categorias.splice(i, 1); saveCats(); renderCats(); }
 
 function addMov() {
-  const fecha = document.getElementById('c-fecha').value;
-  const tipo  = document.getElementById('c-tipo').value;
-  const cat   = document.getElementById('c-cat').value;
-  const desc  = document.getElementById('c-desc').value.trim();
-  const monto = parseFloat(document.getElementById('c-monto').value);
+  var fecha = document.getElementById('c-fecha').value;
+  var tipo  = document.getElementById('c-tipo').value;
+  var cat   = document.getElementById('c-cat').value;
+  var desc  = document.getElementById('c-desc').value.trim();
+  var monto = parseFloat(document.getElementById('c-monto').value);
   if (!fecha || !desc || !cat || isNaN(monto) || monto <= 0) return;
   movimientos.unshift({ id: Date.now(), fecha: fecha, tipo: tipo, cat: cat, desc: desc, monto: monto });
   saveMov(); renderMov();
@@ -335,7 +510,7 @@ function renderMov() {
       '<td class="' + cls + '">' + sign + '$' + fmtN(m.monto) + '</td>' +
       '<td><button class="btn btn-danger btn-sm" onclick="removeMov(' + m.id + ')">×</button></td></tr>';
   }).join('');
-  var bal = ing - eg;
+  var bal   = ing - eg;
   document.getElementById('t-ing').textContent = '+$' + fmtN(ing);
   document.getElementById('t-eg').textContent  = '-$' + fmtN(eg);
   var balEl = document.getElementById('t-bal');
@@ -345,19 +520,13 @@ function renderMov() {
 
 function fmtN(n) { return n.toLocaleString('es-AR'); }
 
-/* ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    EXPORTAR
-─────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 function exportar() {
-  var state = {
-    mov:     movimientos,
-    cats:    categorias,
-    eventos: eventos,
-    tareas:  tareas
-  };
-  var json = JSON.stringify(state);
+  var state = { mov: movimientos, cats: categorias, eventos: eventos, tareas: tareas };
+  var json  = JSON.stringify(state);
 
-  /* Seed: se inyecta en <head> para ejecutar ANTES del init de la app */
   var seedScript = '<scr' + 'ipt id="__seed__">(function(){' +
     'var d=' + json + ';' +
     'localStorage.setItem("mov",JSON.stringify(d.mov));' +
@@ -367,42 +536,25 @@ function exportar() {
     '})();<\/scr' + 'ipt>';
 
   var html = document.documentElement.outerHTML;
-
-  /* Limpiar seed anterior (re-exports sucesivos) */
   html = html.replace(/<script id="__seed__"[\s\S]*?<\/script>/, '');
-
-  /* Resetear nav al estado base: contable activo, resto inactivo */
-  html = html.replace(
-    /(<button class="nav-btn)[^"]*("[ \t]+data-sec="contable")/,
-    '$1 active$2'
-  );
-  html = html.replace(
-    /(<button class="nav-btn)[^"]*("[ \t]+data-sec="agenda")/,
-    '$1$2'
-  );
-  html = html.replace(
-    /(<button class="nav-btn)[^"]*("[ \t]+data-sec="pendientes")/,
-    '$1$2'
-  );
-  /* Resetear secciones: contable visible, resto ocultas */
+  html = html.replace(/(<button class="nav-btn)[^"]*("[ \t]+data-sec="contable")/,  '$1 active$2');
+  html = html.replace(/(<button class="nav-btn)[^"]*("[ \t]+data-sec="agenda")/,    '$1$2');
+  html = html.replace(/(<button class="nav-btn)[^"]*("[ \t]+data-sec="pendientes")/, '$1$2');
   html = html.replace(/(<div id="s-contable" class="sec)[^"]*(")/,  '$1 active$2');
   html = html.replace(/(<div id="s-agenda" class="sec)[^"]*(")/,    '$1$2');
   html = html.replace(/(<div id="s-pendientes" class="sec)[^"]*(")/,'$1$2');
-
-  /* Inyectar seed en <head> — corre antes que el JS de la app */
   html = html.replace('</head>', seedScript + '</head>');
 
-  var blob = new Blob([html], { type: 'text/html' });
-  var a    = document.createElement('a');
-  a.href   = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
   a.download = 'evrichunter-organizacion.html';
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    AGENDA
-─────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 var eventos = LS.get('eventos', {});
 var calAnio = 2026;
 var calMes  = new Date().getMonth();
@@ -411,8 +563,8 @@ var MESES     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agost
 var DIAS      = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 var EV_COLORS = ['#c8a96e','#4caf7d','#e57373','#64b5f6','#ce93d8','#ffb74d','#4db6ac'];
 
-var modalFecha  = null;
-var modalEvIdx  = null;
+var modalFecha = null;
+var modalEvIdx = null;
 
 function navMes(d) {
   calMes += d;
@@ -423,8 +575,7 @@ function navMes(d) {
 
 function renderCal() {
   document.getElementById('cal-title').textContent = MESES[calMes] + ' ' + calAnio;
-
-  document.getElementById('cal-labels').innerHTML = DIAS.map(function(d) {
+  document.getElementById('cal-labels').innerHTML  = DIAS.map(function(d) {
     return '<div class="day-lbl">' + d + '</div>';
   }).join('');
 
@@ -432,27 +583,22 @@ function renderCal() {
   var diasMes   = new Date(calAnio, calMes + 1, 0).getDate();
   var hoy       = new Date();
   var esHoyMes  = hoy.getFullYear() === calAnio && hoy.getMonth() === calMes;
-
   var html = '';
+
   for (var i = 0; i < primerDia; i++) html += '<div class="day-cell empty"></div>';
 
   for (var d = 1; d <= diasMes; d++) {
     var key    = calAnio + '-' + pad(calMes + 1) + '-' + pad(d);
     var isHoy  = esHoyMes && hoy.getDate() === d;
     var evList = eventos[key] || [];
-
-    var pills = '';
+    var pills  = '';
     for (var ei = 0; ei < Math.min(evList.length, 3); ei++) {
       var ev    = evList[ei];
       var label = (ev.time ? ev.time + ' ' : '') + ev.title;
-      /* ev-pill lleva data attributes para evitar closure en loops */
       pills += '<div class="ev-pill" style="background:' + (ev.color || EV_COLORS[0]) + '"' +
-        ' data-key="' + key + '" data-idx="' + ei + '"' +
-        ' onclick="onPillClick(event)">' + label + '</div>';
+        ' data-key="' + key + '" data-idx="' + ei + '" onclick="onPillClick(event)">' + label + '</div>';
     }
-
-    html += '<div class="day-cell' + (isHoy ? ' today' : '') + '"' +
-      ' data-key="' + key + '" onclick="onCellClick(event)">' +
+    html += '<div class="day-cell' + (isHoy ? ' today' : '') + '" data-key="' + key + '" onclick="onCellClick(event)">' +
       '<div class="day-num">' + d + '</div>' + pills + '</div>';
   }
 
@@ -461,22 +607,15 @@ function renderCal() {
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
-/* Separar handlers para evitar conflictos de propagación */
-function onCellClick(e) {
-  var key = e.currentTarget.dataset.key;
-  abrirNuevoEvento(key);
-}
-
+function onCellClick(e) { abrirNuevoEvento(e.currentTarget.dataset.key); }
 function onPillClick(e) {
   e.stopPropagation();
-  var key = e.currentTarget.dataset.key;
-  var idx = parseInt(e.currentTarget.dataset.idx, 10);
-  abrirEdicionEvento(key, idx);
+  abrirEdicionEvento(e.currentTarget.dataset.key, parseInt(e.currentTarget.dataset.idx, 10));
 }
 
 function abrirNuevoEvento(key) {
   modalFecha = key; modalEvIdx = null;
-  document.getElementById('ev-modal-lbl').textContent = key + ' — Nuevo evento';
+  document.getElementById('ev-modal-lbl').textContent    = key + ' — Nuevo evento';
   document.getElementById('ev-title').value = '';
   document.getElementById('ev-time').value  = '';
   document.getElementById('ev-note').value  = '';
@@ -489,7 +628,7 @@ function abrirEdicionEvento(key, idx) {
   var ev = (eventos[key] || [])[idx];
   if (!ev) return;
   modalFecha = key; modalEvIdx = idx;
-  document.getElementById('ev-modal-lbl').textContent = key + ' — Editar evento';
+  document.getElementById('ev-modal-lbl').textContent    = key + ' — Editar evento';
   document.getElementById('ev-title').value = ev.title || '';
   document.getElementById('ev-time').value  = ev.time  || '';
   document.getElementById('ev-note').value  = ev.note  || '';
@@ -498,11 +637,8 @@ function abrirEdicionEvento(key, idx) {
   document.getElementById('ev-overlay').classList.add('open');
 }
 
-function cerrarModal() {
-  document.getElementById('ev-overlay').classList.remove('open');
-}
+function cerrarModal() { document.getElementById('ev-overlay').classList.remove('open'); }
 
-/* Cerrar al click en fondo */
 document.getElementById('ev-overlay').addEventListener('click', function(e) {
   if (e.target === this) cerrarModal();
 });
@@ -514,54 +650,41 @@ function renderColores(sel) {
 }
 
 function selColor(c) { renderColores(c); }
-
-function getColor() {
-  var d = document.querySelector('.c-dot.sel');
-  return d ? d.style.background : EV_COLORS[0];
-}
+function getColor()  { var d = document.querySelector('.c-dot.sel'); return d ? d.style.background : EV_COLORS[0]; }
 
 function guardarEvento() {
   var title = document.getElementById('ev-title').value.trim();
   if (!title) return;
-  var ev = {
-    title: title,
-    time:  document.getElementById('ev-time').value,
-    note:  document.getElementById('ev-note').value.trim(),
-    color: getColor()
-  };
+  var ev = { title: title, time: document.getElementById('ev-time').value, note: document.getElementById('ev-note').value.trim(), color: getColor() };
   if (!eventos[modalFecha]) eventos[modalFecha] = [];
-  if (modalEvIdx !== null) {
-    eventos[modalFecha][modalEvIdx] = ev;
-  } else {
-    eventos[modalFecha].push(ev);
-  }
+  if (modalEvIdx !== null) eventos[modalFecha][modalEvIdx] = ev;
+  else eventos[modalFecha].push(ev);
   LS.set('eventos', eventos);
-  cerrarModal();
-  renderCal();
+  guardarEnFirebase();
+  cerrarModal(); renderCal();
 }
 
 function eliminarEvento() {
-  if (modalEvIdx === null) return;
-  if (!eventos[modalFecha]) return;
+  if (modalEvIdx === null || !eventos[modalFecha]) return;
   eventos[modalFecha].splice(modalEvIdx, 1);
   if (eventos[modalFecha].length === 0) delete eventos[modalFecha];
   LS.set('eventos', eventos);
-  cerrarModal();
-  renderCal();
+  guardarEnFirebase();
+  cerrarModal(); renderCal();
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    PENDIENTES
-─────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 var SUBS       = ['beat','grabacion','procesamiento','mezcla','mastering'];
 var SUBS_LABEL = { beat:'Beat', grabacion:'Grabación', procesamiento:'Procesamiento', mezcla:'Mezcla', mastering:'Mastering' };
 
 var tareas = LS.get('tareas', [
-  { id: 1, artista: 'Gabryel', proyecto: 'EP Verano',    tareas: { beat: true,  grabacion: true,  procesamiento: false, mezcla: false, mastering: false }, done: false },
-  { id: 2, artista: 'Zampe',   proyecto: 'Single Trap',  tareas: { beat: false, grabacion: false, procesamiento: false, mezcla: false, mastering: false }, done: false }
+  { id: 1, artista: 'Gabryel', proyecto: 'EP Verano',   tareas: { beat: true,  grabacion: true,  procesamiento: false, mezcla: false, mastering: false }, done: false },
+  { id: 2, artista: 'Zampe',   proyecto: 'Single Trap', tareas: { beat: false, grabacion: false, procesamiento: false, mezcla: false, mastering: false }, done: false }
 ]);
 
-function saveTareas() { LS.set('tareas', tareas); }
+function saveTareas() { LS.set('tareas', tareas); guardarEnFirebase(); }
 
 function defaultSubs() {
   var o = {};
@@ -597,34 +720,24 @@ function proyectoCard(t) {
   var chips = SUBS.map(function(k) {
     return '<span class="sub-chip ' + (t.tareas[k] ? 'on' : 'off') + '" onclick="toggleSub(' + t.id + ',\'' + k + '\')">' + SUBS_LABEL[k] + '</span>';
   }).join('');
-  var nombre = t.artista
-    ? '<span class="artist">' + t.artista + '</span> — ' + t.proyecto
-    : t.proyecto;
+  var nombre = t.artista ? '<span class="artist">' + t.artista + '</span> — ' + t.proyecto : t.proyecto;
   return '<div class="task-item' + (t.done ? ' done' : '') + '">' +
-    '<div class="task-info">' +
-    '<div class="task-name">' + nombre + '</div>' +
-    '<div class="chips-row">' + chips + '</div>' +
-    '</div>' +
-    '<button class="btn btn-danger btn-sm" onclick="removeProyecto(' + t.id + ')">×</button>' +
-    '</div>';
+    '<div class="task-info"><div class="task-name">' + nombre + '</div><div class="chips-row">' + chips + '</div></div>' +
+    '<button class="btn btn-danger btn-sm" onclick="removeProyecto(' + t.id + ')">×</button></div>';
 }
 
 function renderTasks() {
   var pend = tareas.filter(function(t) { return !t.done; });
   var done = tareas.filter(function(t) { return  t.done; });
-  document.getElementById('task-list').innerHTML = pend.length
-    ? pend.map(proyectoCard).join('')
-    : '<div style="padding:12px;color:var(--muted);font-size:12px">Sin proyectos activos.</div>';
-  document.getElementById('hist-list').innerHTML = done.length
-    ? done.map(proyectoCard).join('')
-    : '<div style="padding:12px;color:var(--muted);font-size:12px">Sin historial.</div>';
+  document.getElementById('task-list').innerHTML = pend.length ? pend.map(proyectoCard).join('') : '<div style="padding:12px;color:var(--muted);font-size:12px">Sin proyectos activos.</div>';
+  document.getElementById('hist-list').innerHTML = done.length ? done.map(proyectoCard).join('') : '<div style="padding:12px;color:var(--muted);font-size:12px">Sin historial.</div>';
   document.getElementById('cnt-pend').textContent = pend.length + ' pendientes';
   document.getElementById('cnt-done').textContent = done.length + ' completados';
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    INIT
-─────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 document.getElementById('c-fecha').value = new Date().toISOString().slice(0, 10);
 renderCats();
 renderMov();
