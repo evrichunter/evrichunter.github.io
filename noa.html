@@ -889,10 +889,10 @@ function pushToCloud(value){
   setBadge('connecting', 'Guardando…');
   set(cloudRef, value).then(()=>{
     setBadge('synced', 'Guardado en la nube ✓');
-    setTimeout(refreshBadge, 1800);
+    setTimeout(refreshBadge, 4000);
   }).catch(err=>{
     console.error('NOA: error guardando en la nube ->', err.code, err.message);
-    setBadge('error', 'Error al guardar (' + err.code + ')');
+    setBadge('error', 'Error al guardar: ' + err.code);
   });
 }
 
