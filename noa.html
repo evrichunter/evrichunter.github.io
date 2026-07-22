@@ -339,6 +339,7 @@ function defaultData(){
     ],
     transactions: [],
     chatLog: [],
+    updatedAt: 0,
     lastResetMonth: currentMonthKey(),
     pending: null
   };
@@ -358,10 +359,11 @@ function load(){
     const parsed = JSON.parse(raw);
     if(!parsed.funds || !Array.isArray(parsed.funds)) return defaultData();
     if(!Array.isArray(parsed.chatLog)) parsed.chatLog = [];
+    if(typeof parsed.updatedAt !== 'number') parsed.updatedAt = 0;
     return parsed;
   }catch(e){ return defaultData(); }
 }
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function save(){ data.updatedAt = Date.now(); localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
 function maybeMonthlyReset(){
   const key = currentMonthKey();
@@ -917,15 +919,22 @@ localStorage.setItem = function(key, value){
   }
 };
 
-// Bajamos los datos de la nube al abrir la app.
+// Bajamos los datos de la nube al abrir la app, pero SOLO si son más nuevos
+// que lo que ya hay localmente. Esto evita que un snapshot viejo de la nube
+// (por ejemplo, guardado en algún momento en que la sincronización todavía
+// fallaba) pise datos locales más recientes y reales.
 onValue(cloudRef, (snapshot)=>{
   const cloudData = snapshot.val();
   if(!cloudData) return; // nada en la nube todavía: la primera escritura local la va a crear
 
   const localRaw = localStorage.getItem(STORAGE_KEY);
-  const cloudRaw = JSON.stringify(cloudData);
-  if(localRaw === cloudRaw) return;
+  const localData = localRaw ? JSON.parse(localRaw) : null;
+  const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
+  const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
 
+  if(cloudUpdatedAt <= localUpdatedAt) return; // lo local es igual o más nuevo: no tocar nada
+
+  const cloudRaw = JSON.stringify(cloudData);
   syncingFromCloud = true;
   originalSetItem(STORAGE_KEY, cloudRaw);
   syncingFromCloud = false;
