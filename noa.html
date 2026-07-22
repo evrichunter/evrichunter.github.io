@@ -880,7 +880,6 @@ function setBadge(state, text){
 
 function refreshBadge(){
   if(!dbConnected){ setBadge('error', 'Sin conexión a la nube'); return; }
-  if(!authReady){ setBadge('connecting', 'Autenticando…'); return; }
   setBadge('synced', 'Sincronizado');
 }
 
@@ -890,22 +889,16 @@ onValue(ref(db, '.info/connected'), (snap)=>{
   refreshBadge();
 });
 
-signInAnonymously(auth).catch(err=>{
-  console.error('NOA: no se pudo autenticar contra Firebase ->', err.code, err.message);
-  setBadge('error', 'Error de autenticación (' + err.code + ')');
+// Intentamos autenticar de forma anónima por si en el futuro las reglas
+// vuelven a exigirlo, pero como ahora las reglas de "noa" son públicas
+// (.read/.write: true), esto ya NO bloquea el guardado si falla o si el
+// proveedor Anónimo no está habilitado en el proyecto.
+signInAnonymously(auth).then(()=>{ authReady = true; }).catch(err=>{
+  console.warn('NOA: autenticación anónima no disponible (no es necesaria con reglas públicas) ->', err.code);
 });
-
-onAuthStateChanged(auth, (user)=>{
-  authReady = !!user;
-  refreshBadge();
-  if(authReady && pendingWrite){
-    pushToCloud(pendingWrite);
-    pendingWrite = null;
-  }
-});
+onAuthStateChanged(auth, (user)=>{ authReady = !!user; });
 
 function pushToCloud(value){
-  if(!authReady){ pendingWrite = value; return; }
   setBadge('connecting', 'Guardando…');
   set(cloudRef, value).then(()=>{
     setBadge('synced', 'Guardado en la nube ✓');
