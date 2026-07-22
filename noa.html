@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>NOA — Asistente Financiero</title>
+<meta name="theme-color" content="#070707">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070707;
+    --bg-elev:#0f0f0f;
+    --card:#141414;
+    --card-2:#1a1a1a;
+    --line:#242422;
+    --gold:#c8a96e;
+    --gold-soft:rgba(200,169,110,.14);
+    --gold-dim:#8a744a;
+    --text:#f2f0ea;
+    --text-dim:#96958d;
+    --text-faint:#5c5b54;
+    --green:#7fae82;
+    --red:#c07b6a;
+    --radius:20px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'DM Sans', -apple-system, sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Syne', sans-serif;}
+  #app{
+    max-width:520px;
+    margin:0 auto;
+    height:100vh;
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(200,169,110,.07), transparent 45%),
+      var(--bg);
+  }
+
+  /* HEADER */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px 14px;
+    flex-shrink:0;
+  }
+  header .brand{display:flex; flex-direction:column;}
+  header .brand .eyebrow{font-size:10px; letter-spacing:.18em; color:var(--text-faint); text-transform:uppercase;}
+  header .brand h1{font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin:2px 0 0; letter-spacing:.01em;}
+  header .brand h1 span{color:var(--gold);}
+  header .actions{display:flex; gap:8px;}
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%;
+    background:var(--card); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-dim); cursor:pointer;
+    transition:background .2s, color .2s, transform .15s;
+  }
+  .icon-btn:active{transform:scale(.92);}
+  .icon-btn:hover{color:var(--gold); border-color:var(--gold-dim);}
+  .icon-btn svg{width:17px; height:17px;}
+
+  /* MAIN VIEWS */
+  main{flex:1; min-height:0; position:relative;}
+  .view{
+    position:absolute; inset:0;
+    overflow-y:auto;
+    padding:0 20px 24px;
+    opacity:0; pointer-events:none;
+    transform:translateY(6px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .view.active{opacity:1; pointer-events:auto; transform:translateY(0);}
+  .view::-webkit-scrollbar{width:0;}
+
+  /* CHAT */
+  #view-chat{display:flex; flex-direction:column; padding-bottom:0;}
+  #chat-log{flex:1; display:flex; flex-direction:column; gap:10px; padding-bottom:14px;}
+  .msg{max-width:86%; padding:12px 15px; border-radius:16px; font-size:14.5px; line-height:1.5; animation:rise .25s ease;}
+  @keyframes rise{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .msg.user{align-self:flex-end; background:var(--gold); color:#161105; border-bottom-right-radius:5px; font-weight:500;}
+  .msg.bot{align-self:flex-start; background:var(--card); border:1px solid var(--line); border-bottom-left-radius:5px; white-space:pre-wrap;}
+  .msg.bot b{color:var(--gold); font-family:'Syne',sans-serif;}
+  .msg .amt-pos{color:var(--green); font-weight:600;}
+  .msg .amt-neg{color:var(--red); font-weight:600;}
+  .msg-time{font-size:10px; color:var(--text-faint); margin-top:4px; align-self:flex-end;}
+  .empty-chat{margin:auto; text-align:center; color:var(--text-faint); font-size:13.5px; padding:40px 20px;}
+  .empty-chat b{display:block; color:var(--text-dim); font-family:'Syne',sans-serif; font-size:16px; margin-bottom:6px;}
+
+  .chat-input-bar{
+    flex-shrink:0; display:flex; align-items:flex-end; gap:8px;
+    padding:12px 0 calc(14px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, transparent, var(--bg) 30%);
+  }
+  #chat-input{
+    flex:1; resize:none; max-height:110px;
+    background:var(--card); border:1px solid var(--line); color:var(--text);
+    border-radius:20px; padding:12px 16px; font-size:15px; font-family:inherit;
+    outline:none;
+  }
+  #chat-input:focus{border-color:var(--gold-dim);}
+  #chat-send{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    background:var(--gold); border:none; color:#161105;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:transform .15s;
+  }
+  #chat-send:active{transform:scale(.9);}
+  #chat-send svg{width:18px; height:18px;}
+
+  /* SECTION HEADINGS */
+  .section-pad{padding-top:6px;}
+  .section-title{font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin:4px 0 18px;}
+
+  /* STATS */
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px;}
+  .stat-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-sm); padding:14px;}
+  .stat-card .label{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em;}
+  .stat-card .value{font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-top:6px;}
+  .stat-card.wide{grid-column:1/3; display:flex; justify-content:space-between; align-items:center;}
+  .stat-card.accent{background:var(--gold-soft); border-color:var(--gold-dim);}
+  .stat-card.accent .value{color:var(--gold);}
+
+  .cat-row{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+  .cat-row .cat-name{width:108px; flex-shrink:0; font-size:13px; color:var(--text-dim);}
+  .cat-bar-track{flex:1; height:8px; background:var(--card-2); border-radius:6px; overflow:hidden;}
+  .cat-bar-fill{height:100%; background:var(--gold); border-radius:6px; transition:width .5s ease;}
+  .cat-amt{width:70px; text-align:right; font-size:12.5px; color:var(--text-dim); flex-shrink:0;}
+
+  .subhead{font-family:'Syne',sans-serif; font-size:14px; color:var(--text-dim); margin:20px 0 12px; text-transform:uppercase; letter-spacing:.06em;}
+
+  .oblig-row{display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
+  .oblig-row:last-child{border-bottom:none;}
+  .oblig-row .pend{color:var(--red);}
+  .oblig-row .done{color:var(--green);}
+
+  /* FUNDS */
+  .fund-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-sm); padding:16px; margin-bottom:12px;}
+  .fund-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
+  .fund-name{font-family:'Syne',sans-serif; font-size:15px; font-weight:600;}
+  .fund-pct{font-size:11px; color:var(--text-faint); background:var(--card-2); padding:3px 8px; border-radius:20px;}
+  .fund-amt{font-size:22px; font-family:'Syne',sans-serif; font-weight:700; margin-bottom:8px;}
+  .fund-amt .goal{font-size:13px; color:var(--text-faint); font-weight:400; font-family:'DM Sans',sans-serif;}
+  .fund-bar-track{height:7px; background:var(--card-2); border-radius:6px; overflow:hidden;}
+  .fund-bar-fill{height:100%; border-radius:6px; background:var(--gold); transition:width .6s ease;}
+  .fund-bar-fill.done{background:var(--green);}
+  .fund-tag{display:inline-block; margin-top:8px; font-size:10.5px; color:var(--green); background:rgba(127,174,130,.12); padding:3px 8px; border-radius:20px;}
+
+  /* BOTTOM NAV */
+  nav#bottomnav{
+    flex-shrink:0; display:flex; justify-content:space-around;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line); background:var(--bg-elev);
+  }
+  .navbtn{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; color:var(--text-faint); font-family:'DM Sans',sans-serif;
+    font-size:10.5px; padding:6px 18px; cursor:pointer; transition:color .2s;
+  }
+  .navbtn svg{width:21px; height:21px;}
+  .navbtn.active{color:var(--gold);}
+
+  /* MODAL / OVERLAY SHEETS */
+  .sheet-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(2px);
+    z-index:50; opacity:0; pointer-events:none; transition:opacity .25s;
+  }
+  .sheet-backdrop.active{opacity:1; pointer-events:auto;}
+  .sheet{
+    position:fixed; left:50%; bottom:0; transform:translate(-50%, 100%);
+    width:100%; max-width:520px; max-height:85vh; overflow-y:auto;
+    background:var(--bg-elev); border-radius:24px 24px 0 0; border:1px solid var(--line); border-bottom:none;
+    padding:18px 20px calc(24px + env(safe-area-inset-bottom));
+    transition:transform .3s cubic-bezier(.32,.72,0,1); z-index:51;
+  }
+  .sheet-backdrop.active .sheet{transform:translate(-50%, 0);}
+  .sheet-handle{width:36px; height:4px; background:var(--line); border-radius:4px; margin:0 auto 16px;}
+  .sheet-title{font-family:'Syne',sans-serif; font-size:19px; font-weight:700; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;}
+
+  .hrow{display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
+  .hrow:last-child{border-bottom:none;}
+  .hrow .amt{font-family:'Syne',sans-serif; font-weight:700;}
+  .hrow .amt.pos{color:var(--green);}
+  .hrow .amt.neg{color:var(--red);}
+  .hrow .meta{color:var(--text-faint); font-size:11.5px;}
+  .undo-btn{background:var(--card); border:1px solid var(--line); color:var(--text-faint); font-size:11px; padding:5px 10px; border-radius:14px; cursor:pointer;}
+  .undo-btn:hover{color:var(--red); border-color:var(--red);}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:11.5px; color:var(--text-faint); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em;}
+  .field input{width:100%; background:var(--card); border:1px solid var(--line); color:var(--text); padding:11px 13px; border-radius:10px; font-size:14px; font-family:inherit;}
+  .field input:focus{outline:none; border-color:var(--gold-dim);}
+  .field-row{display:flex; gap:10px;}
+  .field-row .field{flex:1;}
+  .toggle-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0;}
+  .toggle{width:42px; height:24px; border-radius:20px; background:var(--card-2); position:relative; cursor:pointer; border:1px solid var(--line); flex-shrink:0;}
+  .toggle.on{background:var(--gold-soft); border-color:var(--gold-dim);}
+  .toggle .knob{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--text-faint); transition:transform .2s, background .2s;}
+  .toggle.on .knob{transform:translateX(18px); background:var(--gold);}
+
+  .fund-edit-card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px;}
+  .fund-edit-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .fund-edit-head input.name-input{background:transparent; border:none; font-family:'Syne',sans-serif; font-size:15px; font-weight:600; color:var(--text); padding:0;}
+  .remove-fund{color:var(--red); font-size:11px; cursor:pointer; opacity:.7;}
+  .pct-total{font-size:12px; color:var(--text-dim); text-align:center; margin:6px 0 18px;}
+  .pct-total.bad{color:var(--red);}
+
+  .btn-primary{
+    width:100%; background:var(--gold); color:#161105; border:none; padding:14px; border-radius:14px;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:14.5px; cursor:pointer; margin-top:6px;
+  }
+  .btn-primary:active{transform:scale(.98);}
+  .btn-ghost{
+    width:100%; background:none; color:var(--text-dim); border:1px dashed var(--line); padding:12px; border-radius:14px;
+    font-size:13px; cursor:pointer; margin-top:4px;
+  }
+  .close-x{color:var(--text-faint); cursor:pointer; font-size:20px; line-height:1;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="brand">
+      <span class="eyebrow">The Noise Maker</span>
+      <h1>NO<span>A</span></h1>
+    </div>
+    <div class="actions">
+      <button class="icon-btn" id="btn-history" title="Historial">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-settings" title="Configuración">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- CHAT -->
+    <section id="view-chat" class="view active">
+      <div id="chat-log"></div>
+      <div class="chat-input-bar">
+        <textarea id="chat-input" rows="1" placeholder="Entraron 90000..."></textarea>
+        <button id="chat-send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7Z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="view-stats" class="view section-pad">
+      <div class="section-title">Estado financiero</div>
+      <div class="stat-grid" id="stat-grid"></div>
+      <div class="subhead">Gasto por categoría</div>
+      <div id="cat-breakdown"></div>
+      <div class="subhead">Obligaciones del mes</div>
+      <div id="oblig-list"></div>
+    </section>
+
+    <!-- FUNDS -->
+    <section id="view-funds" class="view section-pad">
+      <div class="section-title">Fondos</div>
+      <div id="funds-list"></div>
+    </section>
+  </main>
+
+  <nav id="bottomnav">
+    <button class="navbtn active" data-view="chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Chat
+    </button>
+    <button class="navbtn" data-view="stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+      Estado
+    </button>
+    <button class="navbtn" data-view="funds">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="7.5" cy="14.5" r="1"/></svg>
+      Fondos
+    </button>
+  </nav>
+</div>
+
+<!-- HISTORY SHEET -->
+<div class="sheet-backdrop" id="backdrop-history">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Historial <span class="close-x" data-close="history">&times;</span></div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS SHEET -->
+<div class="sheet-backdrop" id="backdrop-settings">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Configuración <span class="close-x" data-close="settings">&times;</span></div>
+    <div id="funds-edit-list"></div>
+    <div class="pct-total" id="pct-total-label"></div>
+    <button class="btn-ghost" id="btn-add-fund">+ Agregar fondo</button>
+    <button class="btn-primary" id="btn-save-settings">Guardar cambios</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- DATA MODEL ---------------- */
+const STORAGE_KEY = 'noa_finance_data_v1';
+
+function defaultData(){
+  return {
+    funds: [
+      {id:'personal',  name:'Dinero Personal',      percent:20, goal:0,      current:0, resetMonthly:false, priority:1},
+      {id:'pareja',    name:'Pareja',                percent:5,  goal:0,      current:0, resetMonthly:false, priority:2},
+      {id:'alquiler',  name:'Alquiler',              percent:20, goal:300000, current:0, resetMonthly:true,  priority:3},
+      {id:'servicios', name:'Servicios',             percent:10, goal:80000,  current:0, resetMonthly:true,  priority:4},
+      {id:'deuda',     name:'Deuda',                 percent:10, goal:0,      current:0, resetMonthly:false, priority:5},
+      {id:'emergencia',name:'Emergencia',            percent:15, goal:0,      current:0, resetMonthly:false, priority:6},
+      {id:'equipos',   name:'Equipos y Formación',   percent:10, goal:0,      current:0, resetMonthly:false, priority:7},
+      {id:'marketing', name:'Marketing',             percent:5,  goal:0,      current:0, resetMonthly:false, priority:8},
+      {id:'inversiones',name:'Inversiones',          percent:5,  goal:0,      current:0, resetMonthly:false, priority:9}
+    ],
+    transactions: [],
+    lastResetMonth: currentMonthKey(),
+    pending: null
+  };
+}
+
+function currentMonthKey(){
+  const d = new Date();
+  return d.getFullYear()+'-'+d.getMonth();
+}
+
+let data = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultData();
+    const parsed = JSON.parse(raw);
+    if(!parsed.funds || !Array.isArray(parsed.funds)) return defaultData();
+    return parsed;
+  }catch(e){ return defaultData(); }
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+function maybeMonthlyReset(){
+  const key = currentMonthKey();
+  if(data.lastResetMonth !== key){
+    data.funds.forEach(f=>{ if(f.resetMonthly) f.current = 0; });
+    data.lastResetMonth = key;
+    save();
+  }
+}
+maybeMonthlyReset();
+
+/* ---------------- HELPERS ---------------- */
+function fmt(n){
+  n = Math.round(n||0);
+  return '$' + n.toLocaleString('es-AR');
+}
+function normalize(s){
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+function fundById(id){ return data.funds.find(f=>f.id===id); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ---------------- NLU PARSER ---------------- */
+const INCOME_WORDS  = ['entr','ingres','recib','cobr','deposit','gan','entrada','me pagaron'];
+const REFUND_WORDS  = ['devol','reembols'];
+const EXPENSE_WORDS = ['gast','pagu','compr','sali','saque','abon'];
+
+const CATEGORY_MAP = [
+  {keys:['alquiler','renta'], cat:'Alquiler', fund:'alquiler'},
+  {keys:['luz','gas natural',' gas ','internet','wifi','telefon','celular','servicio'], cat:'Servicios', fund:'servicios'},
+  {keys:['plugin','sinte','microfono','interfaz','monitores de estudio','cable','equipo','licencia','software audio'], cat:'Equipos y Formación', fund:'equipos'},
+  {keys:['estudio','formacion','curso','capacitacion'], cat:'Equipos y Formación', fund:'equipos'},
+  {keys:['marketing','publicidad','ads','anuncio','promocion'], cat:'Marketing', fund:'marketing'},
+  {keys:['inversion','cripto','acciones','plazo fijo'], cat:'Inversiones', fund:'inversiones'},
+  {keys:['deuda','prestamo','cuota tarjeta','tarjeta de credito'], cat:'Deuda', fund:'deuda'},
+  {keys:['pareja','novia','novio','esposa','esposo'], cat:'Pareja', fund:'pareja'},
+  {keys:['emergencia'], cat:'Emergencia', fund:'emergencia'},
+  {keys:['supermercado','super','almacen','verduleria','carniceria'], cat:'Supermercado', fund:'personal'},
+  {keys:['uber','taxi','remis','nafta','combustible','colectivo','subte'], cat:'Transporte', fund:'personal'},
+  {keys:['delivery','comida','restaurant','resto','pedidos ya','rappi'], cat:'Comida afuera', fund:'personal'},
+  {keys:['ropa','indumentaria'], cat:'Ropa', fund:'personal'},
+  {keys:['salud','farmacia','medico','remedios'], cat:'Salud', fund:'personal'}
+];
+
+function findAmount(normText){
+  const matches = normText.match(/\d[\d.,]*\d|\d/g);
+  if(!matches) return null;
+  let best = null, bestVal = -1;
+  matches.forEach(m=>{
+    const digits = m.replace(/[.,]/g,'');
+    const val = parseInt(digits, 10);
+    if(!isNaN(val) && val > bestVal){ bestVal = val; best = val; }
+  });
+  return best;
+}
+
+function detectCategory(normText){
+  for(const row of CATEGORY_MAP){
+    for(const k of row.keys){
+      if(normText.includes(k)) return row;
+    }
+  }
+  return null;
+}
+
+function detectType(normText){
+  const hasRefund = REFUND_WORDS.some(w=>normText.includes(w));
+  if(hasRefund) return 'refund';
+  const hasIncome = INCOME_WORDS.some(w=>normText.includes(w));
+  const hasExpense = EXPENSE_WORDS.some(w=>normText.includes(w));
+  if(hasExpense) return 'expense';
+  if(hasIncome) return 'income';
+  return null;
+}
+
+function parseMessage(raw){
+  const n = normalize(raw);
+  const type = detectType(n);
+  const amount = findAmount(n);
+  const catRow = detectCategory(n);
+  return {raw, type, amount, catRow};
+}
+
+/* ---------------- FINANCE ENGINE ---------------- */
+function isFundComplete(f){ return f.goal > 0 && f.current >= f.goal; }
+
+function distributeIncome(amount){
+  const active = data.funds.filter(f=>!isFundComplete(f));
+  const totalPct = active.reduce((s,f)=>s+f.percent,0) || 1;
+  const breakdown = [];
+  let remaining = amount;
+  active.sort((a,b)=>a.priority-b.priority).forEach((f, idx)=>{
+    let share = idx === active.length-1 ? remaining : Math.round(amount * (f.percent/totalPct));
+    if(f.goal > 0){
+      const room = f.goal - f.current;
+      if(share > room) share = Math.max(room,0);
+    }
+    share = Math.min(share, remaining);
+    f.current += share;
+    remaining -= share;
+    if(share > 0) breakdown.push({fundId:f.id, name:f.name, amount:share, completed:isFundComplete(f)});
+  });
+  if(remaining > 0){
+    const fallback = fundById('personal');
+    fallback.current += remaining;
+    breakdown.push({fundId:'personal', name:fallback.name, amount:remaining, completed:false});
+  }
+  return breakdown;
+}
+
+function recordTransaction(tx){
+  data.transactions.unshift(tx);
+  save();
+}
+
+function undoTransaction(id){
+  const idx = data.transactions.findIndex(t=>t.id===id);
+  if(idx === -1) return;
+  const tx = data.transactions[idx];
+  (tx.breakdown||[]).forEach(b=>{
+    const f = fundById(b.fundId);
+    if(f) f.current -= b.amount;
+  });
+  data.transactions.splice(idx,1);
+  save();
+  renderAll();
+}
+
+/* ---------------- CHAT RENDER ---------------- */
+const chatLog = document.getElementById('chat-log');
+const chatInput = document.getElementById('chat-input');
+
+function addMsg(text, who){
+  const emptyState = chatLog.querySelector('.empty-chat');
+  if(emptyState) emptyState.remove();
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + who;
+  wrap.innerHTML = text;
+  chatLog.appendChild(wrap);
+  chatLog.parentElement.scrollTop = chatLog.parentElement.scrollHeight;
+}
+
+function renderEmptyChat(){
+  if(chatLog.children.length) return;
+  chatLog.innerHTML = '<div class="empty-chat"><b>Contame qué pasó</b>Escribí algo como "Entraron 175000" o "Gasté 8500 en supermercado". Yo me encargo del resto.</div>';
+}
+
+function handleUserMessage(text){
+  text = text.trim();
+  if(!text) return;
+  addMsg(escapeHtml(text), 'user');
+
+  if(data.pending){
+    const n = normalize(text);
+    if(n.includes('ingreso') || n.includes('entro') || n.includes('cobre')){
+      processIncome(data.pending.amount, data.pending.raw, data.pending.catRow);
+      data.pending = null; save();
+      return;
+    }
+    if(n.includes('gasto') || n.includes('pague') || n.includes('gaste')){
+      processExpense(data.pending.amount, data.pending.raw, data.pending.catRow);
+      data.pending = null; save();
+      return;
+    }
+  }
+
+  const parsed = parseMessage(text);
+
+  if(parsed.type === 'refund'){
+    const amt = parsed.amount || 0;
+    if(!amt){ addMsg('¿De cuánto fue la devolución? Decime el monto.', 'bot'); return; }
+    const personal = fundById('personal');
+    personal.current += amt;
+    recordTransaction({id:uid(), ts:Date.now(), type:'income', amount:amt, category:'Devolución', raw:text, breakdown:[{fundId:'personal', name:personal.name, amount:amt}]});
+    addMsg('<b>Reembolso recibido</b>\n' + fmt(amt) + ' agregado directamente a <b>Dinero Personal</b>.\nNuevo saldo: ' + fmt(personal.current), 'bot');
+    renderAll();
+    return;
+  }
+
+  if(parsed.type === 'income'){
+    if(!parsed.amount){ addMsg('¿De cuánto fue el ingreso? Decime el monto, por ejemplo "Entraron 90000".', 'bot'); return; }
+    processIncome(parsed.amount, text, parsed.catRow);
+    return;
+  }
+
+  if(parsed.type === 'expense'){
+    let amt = parsed.amount;
+    if(!amt && parsed.catRow){
+      const f = fundById(parsed.catRow.fund);
+      if(f && f.goal > 0 && f.current > 0){
+        amt = f.current; // pagar la obligación completa acumulada
+      }
+    }
+    if(!amt){ addMsg('¿De cuánto fue el gasto? Decime el monto, por ejemplo "Gasté 8500 en supermercado".', 'bot'); return; }
+    processExpense(amt, text, parsed.catRow);
+    return;
+  }
+
+  // ambiguous — ask for clarification
+  if(parsed.amount){
+    data.pending = {amount: parsed.amount, raw: text, catRow: parsed.catRow};
+    save();
+    addMsg('No entendí si fue un <b>ingreso</b> o un <b>gasto</b> de ' + fmt(parsed.amount) + '. Respondé "ingreso" o "gasto" para confirmarlo.', 'bot');
+    return;
+  }
+
+  addMsg('No pude identificar un monto en ese mensaje. Probá algo como "Gasté 8500 en supermercado" o "Entraron 90000".', 'bot');
+}
+
+function processIncome(amount, raw, catRow){
+  const breakdown = distributeIncome(amount);
+  recordTransaction({id:uid(), ts:Date.now(), type:'income', amount, category: catRow ? catRow.cat : 'Ingreso', raw, breakdown});
+  let lines = '<b>Ingreso registrado</b>\n' + fmt(amount) + '\n\nDistribución automática:\n';
+  breakdown.forEach(b=>{
+    lines += '• ' + b.name + ' <span class="amt-pos">+' + fmt(b.amount) + '</span>' + (b.completed ? ' → completo ✅' : '') + '\n';
+  });
+  const disponible = data.funds.filter(f=>f.id!=='alquiler' && f.id!=='servicios' && f.id!=='deuda').reduce((s,f)=>s+f.current,0);
+  lines += '\nDisponible ahora: ' + fmt(disponible);
+  addMsg(lines, 'bot');
+  renderAll();
+}
+
+function processExpense(amount, raw, catRow){
+  const fundId = catRow ? catRow.fund : 'personal';
+  const f = fundById(fundId) || fundById('personal');
+  f.current -= amount;
+  const wasComplete = catRow ? false : false;
+  const nowIncomplete = f.goal > 0 && f.current < f.goal;
+  recordTransaction({id:uid(), ts:Date.now(), type:'expense', amount, category: catRow ? catRow.cat : 'Otros', raw, breakdown:[{fundId:f.id, name:f.name, amount:-amount}]});
+  let msg = '<b>Gasto registrado</b>\n' + fmt(amount) + ' — ' + (catRow ? catRow.cat : 'Otros') + '\nFondo afectado: ' + f.name;
+  if(f.current < 0) msg += '\n⚠️ Saldo del fondo en negativo.';
+  msg += '\nSaldo restante: <span class="' + (f.current>=0?'amt-pos':'amt-neg') + '">' + fmt(f.current) + '</span>';
+  addMsg(msg, 'bot');
+  renderAll();
+}
+
+function escapeHtml(s){
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+/* ---------------- HISTORY RENDER ---------------- */
+function renderHistory(){
+  const list = document.getElementById('history-list');
+  if(!data.transactions.length){
+    list.innerHTML = '<div style="padding:24px 0; text-align:center; color:var(--text-faint); font-size:13px;">Todavía no hay movimientos.</div>';
+    return;
+  }
+  list.innerHTML = data.transactions.map(tx=>{
+    const d = new Date(tx.ts);
+    const dateStr = d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'}) + ' · ' + d.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+    const sign = tx.type === 'income' ? '+' : '-';
+    const cls = tx.type === 'income' ? 'pos' : 'neg';
+    return '<div class="hrow"><div><div>'+tx.category+'</div><div class="meta">'+dateStr+'</div></div>' +
+      '<div style="display:flex; align-items:center; gap:10px;"><span class="amt '+cls+'">'+sign+fmt(tx.amount)+'</span>' +
+      '<span class="undo-btn" data-undo="'+tx.id+'">Deshacer</span></div></div>';
+  }).join('');
+  list.querySelectorAll('[data-undo]').forEach(btn=>{
+    btn.addEventListener('click', ()=> undoTransaction(btn.getAttribute('data-undo')));
+  });
+}
+
+/* ---------------- STATS RENDER ---------------- */
+function renderStats(){
+  const now = new Date();
+  const monthTx = data.transactions.filter(t=>{
+    const d = new Date(t.ts);
+    return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+  });
+  const ingresos = monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const gastos = monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const ahorro = ingresos - gastos;
+  const dayOfMonth = now.getDate();
+  const promedioDiario = gastos / dayOfMonth;
+  const disponible = data.funds.reduce((s,f)=>s+f.current,0);
+  const fondosCompletos = data.funds.filter(isFundComplete).length;
+
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-card"><div class="label">Ingresos del mes</div><div class="value">${fmt(ingresos)}</div></div>
+    <div class="stat-card"><div class="label">Gastos del mes</div><div class="value">${fmt(gastos)}</div></div>
+    <div class="stat-card accent"><div class="label">Ahorro generado</div><div class="value">${fmt(ahorro)}</div></div>
+    <div class="stat-card"><div class="label">Promedio diario</div><div class="value">${fmt(promedioDiario)}</div></div>
+    <div class="stat-card wide"><div><div class="label">Disponible total</div><div class="value">${fmt(disponible)}</div></div><div style="text-align:right"><div class="label">Fondos completos</div><div class="value">${fondosCompletos}/${data.funds.length}</div></div></div>
+  `;
+
+  const catTotals = {};
+  monthTx.filter(t=>t.type==='expense').forEach(t=>{
+    catTotals[t.category] = (catTotals[t.category]||0) + t.amount;
+  });
+  const catEntries = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+  const maxCat = catEntries.length ? catEntries[0][1] : 1;
+  const catEl = document.getElementById('cat-breakdown');
+  if(!catEntries.length){
+    catEl.innerHTML = '<div style="color:var(--text-faint); font-size:13px; padding:6px 0 4px;">Sin gastos registrados este mes.</div>';
+  } else {
+    catEl.innerHTML = catEntries.map(([cat, amt])=>`
+      <div class="cat-row">
+        <div class="cat-name">${cat}</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.max(6, amt/maxCat*100)}%"></div></div>
+        <div class="cat-amt">${fmt(amt)}</div>
+      </div>`).join('');
+  }
+
+  const obligFunds = data.funds.filter(f=>f.resetMonthly && f.goal>0);
+  const obligEl = document.getElementById('oblig-list');
+  if(!obligFunds.length){
+    obligEl.innerHTML = '<div style="color:var(--text-faint); font-size:13px; padding:6px 0 4px;">No hay obligaciones configuradas.</div>';
+  } else {
+    obligEl.innerHTML = obligFunds.map(f=>{
+      const done = isFundComplete(f);
+      return `<div class="oblig-row"><span>${f.name}</span><span class="${done?'done':'pend'}">${done ? 'Completo ✅' : fmt(f.goal-f.current)+' restante'}</span></div>`;
+    }).join('');
+  }
+}
+
+/* ---------------- FUNDS RENDER ---------------- */
+function renderFunds(){
+  const el = document.getElementById('funds-list');
+  el.innerHTML = data.funds.slice().sort((a,b)=>a.priority-b.priority).map(f=>{
+    const pct = f.goal>0 ? Math.min(100, f.current/f.goal*100) : null;
+    const done = isFundComplete(f);
+    return `<div class="fund-card">
+      <div class="fund-top"><span class="fund-name">${f.name}</span><span class="fund-pct">${f.percent}%</span></div>
+      <div class="fund-amt">${fmt(f.current)} ${f.goal>0 ? '<span class="goal">/ '+fmt(f.goal)+'</span>' : ''}</div>
+      ${f.goal>0 ? `<div class="fund-bar-track"><div class="fund-bar-fill ${done?'done':''}" style="width:${pct}%"></div></div>` : ''}
+      ${f.resetMonthly ? '<span class="fund-tag">Se reinicia cada mes</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderAll(){
+  renderStats();
+  renderFunds();
+  renderHistory();
+}
+
+/* ---------------- SETTINGS SHEET ---------------- */
+function renderSettingsForm(){
+  const el = document.getElementById('funds-edit-list');
+  el.innerHTML = data.funds.map((f,i)=>`
+    <div class="fund-edit-card" data-idx="${i}">
+      <div class="fund-edit-head">
+        <input class="name-input" data-field="name" value="${f.name}">
+        <span class="remove-fund" data-remove="${i}">Eliminar</span>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Porcentaje %</label><input type="number" data-field="percent" value="${f.percent}"></div>
+        <div class="field"><label>Meta (0 = sin meta)</label><input type="number" data-field="goal" value="${f.goal}"></div>
+      </div>
+      <div class="toggle-row">
+        <span style="font-size:13px; color:var(--text-dim);">Reiniciar cada mes</span>
+        <div class="toggle ${f.resetMonthly?'on':''}" data-toggle="resetMonthly"><div class="knob"></div></div>
+      </div>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('input[data-field]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const card = e.target.closest('.fund-edit-card');
+      const idx = +card.getAttribute('data-idx');
+      const field = e.target.getAttribute('data-field');
+      const val = field === 'name' ? e.target.value : (parseFloat(e.target.value)||0);
+      data.funds[idx][field] = val;
+      updatePctTotal();
+    });
+  });
+  el.querySelectorAll('[data-toggle]').forEach(tg=>{
+    tg.addEventListener('click', e=>{
+      const card = e.target.closest('.fund-edit-card');
+      const idx = +card.getAttribute('data-idx');
+      data.funds[idx].resetMonthly = !data.funds[idx].resetMonthly;
+      tg.classList.toggle('on', data.funds[idx].resetMonthly);
+    });
+  });
+  el.querySelectorAll('[data-remove]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const idx = +e.target.getAttribute('data-remove');
+      if(confirm('¿Eliminar este fondo?')){
+        data.funds.splice(idx,1);
+        renderSettingsForm();
+      }
+    });
+  });
+  updatePctTotal();
+}
+
+function updatePctTotal(){
+  const total = data.funds.reduce((s,f)=>s+(f.percent||0),0);
+  const label = document.getElementById('pct-total-label');
+  label.textContent = 'Total asignado: ' + total + '%';
+  label.classList.toggle('bad', total !== 100);
+}
+
+document.getElementById('btn-add-fund').addEventListener('click', ()=>{
+  data.funds.push({id:uid(), name:'Nuevo fondo', percent:0, goal:0, current:0, resetMonthly:false, priority:data.funds.length+1});
+  renderSettingsForm();
+});
+document.getElementById('btn-save-settings').addEventListener('click', ()=>{
+  save();
+  renderAll();
+  closeSheet('settings');
+});
+
+/* ---------------- NAVIGATION ---------------- */
+document.querySelectorAll('.navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.getAttribute('data-view')).classList.add('active');
+  });
+});
+
+function openSheet(name){
+  document.getElementById('backdrop-'+name).classList.add('active');
+  if(name==='history') renderHistory();
+  if(name==='settings') renderSettingsForm();
+}
+function closeSheet(name){
+  document.getElementById('backdrop-'+name).classList.remove('active');
+}
+document.getElementById('btn-history').addEventListener('click', ()=>openSheet('history'));
+document.getElementById('btn-settings').addEventListener('click', ()=>openSheet('settings'));
+document.querySelectorAll('[data-close]').forEach(x=>{
+  x.addEventListener('click', ()=>closeSheet(x.getAttribute('data-close')));
+});
+document.querySelectorAll('.sheet-backdrop').forEach(bd=>{
+  bd.addEventListener('click', e=>{ if(e.target===bd) bd.classList.remove('active'); });
+});
+
+/* ---------------- CHAT INPUT WIRING ---------------- */
+document.getElementById('chat-send').addEventListener('click', ()=>{
+  const val = chatInput.value;
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  handleUserMessage(val);
+});
+chatInput.addEventListener('keydown', e=>{
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    document.getElementById('chat-send').click();
+  }
+});
+chatInput.addEventListener('input', ()=>{
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(110, chatInput.scrollHeight) + 'px';
+});
+
+/* ---------------- SERVICE WORKER ---------------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+/* ---------------- INIT ---------------- */
+renderEmptyChat();
+renderAll();
+
+})();
+</script>
+
+<!-- ===== Firebase sync (evric-agenda) — capa aditiva, no toca la lógica de arriba ===== -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const cfg = {
+  apiKey: "AIzaSyDWE64UYQMQFKT0nreF7ax59gzI2OsIVmE",
+  authDomain: "evric-agenda.firebaseapp.com",
+  databaseURL: "https://evric-agenda-default-rtdb.firebaseio.com",
+  projectId: "evric-agenda",
+  storageBucket: "evric-agenda.firebasestorage.app",
+  messagingSenderId: "239254402707",
+  appId: "1:239254402707:web:bda9f7ae205b14cb81bf66"
+};
+
+const STORAGE_KEY = 'noa_finance_data_v1';
+const app = initializeApp(cfg, 'noa-app');
+const db = getDatabase(app);
+const cloudRef = ref(db, 'noa/data');
+
+let syncingFromCloud = false;
+let hasReloadedOnce = sessionStorage.getItem('noa_cloud_reloaded') === '1';
+
+// Interceptamos localStorage.setItem para empujar cada cambio local a la nube,
+// sin modificar el motor de la app (que sigue llamando a save() como siempre).
+const originalSetItem = localStorage.setItem.bind(localStorage);
+localStorage.setItem = function(key, value){
+  originalSetItem(key, value);
+  if(key === STORAGE_KEY && !syncingFromCloud){
+    try{ set(cloudRef, JSON.parse(value)); }catch(e){ /* noop */ }
+  }
+};
+
+// Bajamos los datos de la nube al abrir la app.
+onValue(cloudRef, (snapshot)=>{
+  const cloudData = snapshot.val();
+  if(!cloudData) return; // nada en la nube todavía: la primera escritura local la va a crear
+
+  const localRaw = localStorage.getItem(STORAGE_KEY);
+  const cloudRaw = JSON.stringify(cloudData);
+  if(localRaw === cloudRaw) return;
+
+  syncingFromCloud = true;
+  originalSetItem(STORAGE_KEY, cloudRaw);
+  syncingFromCloud = false;
+
+  // Si la app ya había renderizado con datos viejos, recargamos una sola vez
+  // para que tome el estado sincronizado desde la nube.
+  if(!hasReloadedOnce){
+    hasReloadedOnce = true;
+    sessionStorage.setItem('noa_cloud_reloaded', '1');
+    location.reload();
+  }
+}, (err)=>{ console.warn('NOA cloud sync error:', err); });
+</script>
+</body>
+</html>
