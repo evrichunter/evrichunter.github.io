@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -360,6 +359,7 @@ function load(){
     const parsed = JSON.parse(raw);
     if(!parsed.funds || !Array.isArray(parsed.funds)) return defaultData();
     if(!Array.isArray(parsed.chatLog)) parsed.chatLog = [];
+    if(!Array.isArray(parsed.transactions)) parsed.transactions = [];
     if(typeof parsed.updatedAt !== 'number') parsed.updatedAt = 0;
     return parsed;
   }catch(e){ return defaultData(); }
@@ -706,9 +706,9 @@ function renderFunds(){
 }
  
 function renderAll(){
-  renderStats();
-  renderFunds();
-  renderHistory();
+  try{ renderStats(); }catch(e){ console.error('NOA: error en renderStats ->', e); }
+  try{ renderFunds(); }catch(e){ console.error('NOA: error en renderFunds ->', e); }
+  try{ renderHistory(); }catch(e){ console.error('NOA: error en renderHistory ->', e); }
 }
  
 /* ---------------- SETTINGS SHEET ---------------- */
@@ -927,6 +927,15 @@ localStorage.setItem = function(key, value){
 onValue(cloudRef, (snapshot)=>{
   const cloudData = snapshot.val();
   if(!cloudData) return; // nada en la nube todavía: la primera escritura local la va a crear
+  if(!cloudData.funds || !Array.isArray(cloudData.funds) || !cloudData.funds.length){
+    // Firebase Realtime Database borra los campos con array vacío al guardar
+    // (p.ej. "transactions: []" en el primer guardado), así que un snapshot
+    // sin "funds" válido está corrupto: no lo bajamos para no romper la app.
+    console.warn('NOA: snapshot de la nube con forma inválida, se ignora ->', cloudData);
+    return;
+  }
+  if(!Array.isArray(cloudData.transactions)) cloudData.transactions = [];
+  if(!Array.isArray(cloudData.chatLog)) cloudData.chatLog = [];
  
   const localRaw = localStorage.getItem(STORAGE_KEY);
   const localData = localRaw ? JSON.parse(localRaw) : null;
@@ -954,4 +963,3 @@ onValue(cloudRef, (snapshot)=>{
 </script>
 </body>
 </html>
- 
