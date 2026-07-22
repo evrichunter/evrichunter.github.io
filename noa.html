@@ -452,21 +452,44 @@ function parseMessage(raw){
 function isFundComplete(f){ return f.goal > 0 && f.current >= f.goal; }
  
 function distributeIncome(amount){
-  const active = data.funds.filter(f=>!isFundComplete(f));
-  const totalPct = active.reduce((s,f)=>s+f.percent,0) || 1;
   const breakdown = [];
+  const contributions = {}; // fundId -> monto acumulado en ESTA transacción
   let remaining = amount;
-  active.sort((a,b)=>a.priority-b.priority).forEach((f, idx)=>{
-    let share = idx === active.length-1 ? remaining : Math.round(amount * (f.percent/totalPct));
-    if(f.goal > 0){
-      const room = f.goal - f.current;
-      if(share > room) share = Math.max(room,0);
-    }
-    share = Math.min(share, remaining);
-    f.current += share;
-    remaining -= share;
-    if(share > 0) breakdown.push({fundId:f.id, name:f.name, amount:share, completed:isFundComplete(f)});
+  let pool = data.funds.filter(f=>!isFundComplete(f));
+ 
+  let guard = 0;
+  while(remaining > 0 && pool.length && guard < 20){
+    guard++;
+    const totalPct = pool.reduce((s,f)=>s+f.percent,0) || 1;
+    let distributedThisPass = 0;
+    const stillOpen = [];
+    pool.slice().sort((a,b)=>a.priority-b.priority).forEach(f=>{
+      let share = Math.round(remaining * (f.percent/totalPct));
+      if(f.goal > 0){
+        const room = f.goal - f.current - (contributions[f.id]||0);
+        if(share > room) share = Math.max(room,0);
+      }
+      if(share > remaining - distributedThisPass) share = remaining - distributedThisPass;
+      if(share > 0){
+        contributions[f.id] = (contributions[f.id]||0) + share;
+        distributedThisPass += share;
+      }
+      const projectedTotal = f.current + (contributions[f.id]||0);
+      const willBeFull = f.goal > 0 && projectedTotal >= f.goal;
+      if(!willBeFull) stillOpen.push(f);
+    });
+    remaining -= distributedThisPass;
+    pool = stillOpen;
+    if(distributedThisPass === 0) break; // nadie pudo absorber más en esta pasada
+  }
+ 
+  Object.keys(contributions).forEach(fundId=>{
+    const f = fundById(fundId);
+    if(!f || contributions[fundId] <= 0) return;
+    f.current += contributions[fundId];
+    breakdown.push({fundId:f.id, name:f.name, amount:contributions[fundId], completed:isFundComplete(f)});
   });
+ 
   if(remaining > 0){
     const fallback = fundById('personal');
     fallback.current += remaining;
@@ -700,6 +723,7 @@ function renderFunds(){
       <div class="fund-top"><span class="fund-name">${f.name}</span><span class="fund-pct">${f.percent}%</span></div>
       <div class="fund-amt">${fmt(f.current)} ${f.goal>0 ? '<span class="goal">/ '+fmt(f.goal)+'</span>' : ''}</div>
       ${f.goal>0 ? `<div class="fund-bar-track"><div class="fund-bar-fill ${done?'done':''}" style="width:${pct}%"></div></div>` : ''}
+      ${done ? '<span class="fund-tag" style="color:var(--green); background:rgba(127,174,130,.12);">Completo — ya no recibe reparto</span>' : ''}
       ${f.resetMonthly ? '<span class="fund-tag">Se reinicia cada mes</span>' : ''}
     </div>`;
   }).join('');
