@@ -827,8 +827,9 @@ renderAll();
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-const cfg = {
+const firebaseConfig = {
   apiKey: "AIzaSyDWE64UYQMQFKT0nreF7ax59gzI2OsIVmE",
   authDomain: "evric-agenda.firebaseapp.com",
   databaseURL: "https://evric-agenda-default-rtdb.firebaseio.com",
@@ -839,12 +840,38 @@ const cfg = {
 };
 
 const STORAGE_KEY = 'noa_finance_data_v1';
-const app = initializeApp(cfg, 'noa-app');
+const app = initializeApp(firebaseConfig, 'noa-app');
 const db = getDatabase(app);
+const auth = getAuth(app);
 const cloudRef = ref(db, 'noa/data');
 
 let syncingFromCloud = false;
 let hasReloadedOnce = sessionStorage.getItem('noa_cloud_reloaded') === '1';
+let authReady = false;
+let pendingWrite = null;
+
+// La mayoría de las reglas de Realtime Database exigen "auth != null".
+// Si no había un usuario autenticado, set() fallaba en silencio y por eso
+// no estaba llegando nada a la nube. Con esto entra un usuario anónimo
+// (no requiere login ni pantalla, es transparente para vos).
+signInAnonymously(auth).catch(err=>{
+  console.error('NOA: no se pudo autenticar contra Firebase ->', err.code, err.message);
+});
+
+onAuthStateChanged(auth, (user)=>{
+  authReady = !!user;
+  if(authReady && pendingWrite){
+    pushToCloud(pendingWrite);
+    pendingWrite = null;
+  }
+});
+
+function pushToCloud(value){
+  if(!authReady){ pendingWrite = value; return; }
+  set(cloudRef, value).catch(err=>{
+    console.error('NOA: error guardando en la nube ->', err.code, err.message);
+  });
+}
 
 // Interceptamos localStorage.setItem para empujar cada cambio local a la nube,
 // sin modificar el motor de la app (que sigue llamando a save() como siempre).
@@ -852,7 +879,7 @@ const originalSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function(key, value){
   originalSetItem(key, value);
   if(key === STORAGE_KEY && !syncingFromCloud){
-    try{ set(cloudRef, JSON.parse(value)); }catch(e){ /* noop */ }
+    try{ pushToCloud(JSON.parse(value)); }catch(e){ console.error('NOA: JSON inválido al sincronizar ->', e); }
   }
 };
 
@@ -876,7 +903,7 @@ onValue(cloudRef, (snapshot)=>{
     sessionStorage.setItem('noa_cloud_reloaded', '1');
     location.reload();
   }
-}, (err)=>{ console.warn('NOA cloud sync error:', err); });
+}, (err)=>{ console.warn('NOA: error leyendo de la nube ->', err.code, err.message); });
 </script>
 </body>
 </html>
