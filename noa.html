@@ -823,6 +823,21 @@ renderAll();
 })();
 </script>
 
+<style>
+  #noa-sync-badge{
+    position:fixed; top:calc(8px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
+    z-index:60; display:flex; align-items:center; gap:6px;
+    background:rgba(20,20,20,.92); border:1px solid #242422; padding:5px 13px; border-radius:20px;
+    font-family:'DM Sans',sans-serif; font-size:11px; color:#96958d; backdrop-filter:blur(6px);
+    transition:opacity .3s, background .3s; pointer-events:none;
+  }
+  #noa-sync-badge .dot{width:7px; height:7px; border-radius:50%; background:#5c5b54; transition:background .3s; flex-shrink:0;}
+  #noa-sync-badge.state-synced .dot{background:#7fae82;}
+  #noa-sync-badge.state-error .dot{background:#c07b6a;}
+  #noa-sync-badge.state-connecting .dot{background:#c8a96e; animation:noa-pulse 1s infinite;}
+  @keyframes noa-pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+</style>
+
 <!-- ===== Firebase sync (evric-agenda) — capa aditiva, no toca la lógica de arriba ===== -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -848,18 +863,41 @@ const cloudRef = ref(db, 'noa/data');
 let syncingFromCloud = false;
 let hasReloadedOnce = sessionStorage.getItem('noa_cloud_reloaded') === '1';
 let authReady = false;
+let dbConnected = false;
 let pendingWrite = null;
 
-// La mayoría de las reglas de Realtime Database exigen "auth != null".
-// Si no había un usuario autenticado, set() fallaba en silencio y por eso
-// no estaba llegando nada a la nube. Con esto entra un usuario anónimo
-// (no requiere login ni pantalla, es transparente para vos).
+/* ---- Indicador visible de sincronización ---- */
+const badge = document.createElement('div');
+badge.id = 'noa-sync-badge';
+badge.className = 'state-connecting';
+badge.innerHTML = '<span class="dot"></span><span class="txt">Conectando…</span>';
+document.body.appendChild(badge);
+
+function setBadge(state, text){
+  badge.className = 'state-' + state;
+  badge.querySelector('.txt').textContent = text;
+}
+
+function refreshBadge(){
+  if(!dbConnected){ setBadge('error', 'Sin conexión a la nube'); return; }
+  if(!authReady){ setBadge('connecting', 'Autenticando…'); return; }
+  setBadge('synced', 'Sincronizado');
+}
+
+// Conexión real a la base (no es un supuesto: es el estado que reporta Firebase).
+onValue(ref(db, '.info/connected'), (snap)=>{
+  dbConnected = snap.val() === true;
+  refreshBadge();
+});
+
 signInAnonymously(auth).catch(err=>{
   console.error('NOA: no se pudo autenticar contra Firebase ->', err.code, err.message);
+  setBadge('error', 'Error de autenticación (' + err.code + ')');
 });
 
 onAuthStateChanged(auth, (user)=>{
   authReady = !!user;
+  refreshBadge();
   if(authReady && pendingWrite){
     pushToCloud(pendingWrite);
     pendingWrite = null;
@@ -868,8 +906,13 @@ onAuthStateChanged(auth, (user)=>{
 
 function pushToCloud(value){
   if(!authReady){ pendingWrite = value; return; }
-  set(cloudRef, value).catch(err=>{
+  setBadge('connecting', 'Guardando…');
+  set(cloudRef, value).then(()=>{
+    setBadge('synced', 'Guardado en la nube ✓');
+    setTimeout(refreshBadge, 1800);
+  }).catch(err=>{
     console.error('NOA: error guardando en la nube ->', err.code, err.message);
+    setBadge('error', 'Error al guardar (' + err.code + ')');
   });
 }
 
@@ -903,7 +946,10 @@ onValue(cloudRef, (snapshot)=>{
     sessionStorage.setItem('noa_cloud_reloaded', '1');
     location.reload();
   }
-}, (err)=>{ console.warn('NOA: error leyendo de la nube ->', err.code, err.message); });
+}, (err)=>{
+  console.warn('NOA: error leyendo de la nube ->', err.code, err.message);
+  setBadge('error', 'Error de lectura (' + err.code + ')');
+});
 </script>
 </body>
 </html>
