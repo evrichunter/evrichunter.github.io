@@ -842,7 +842,6 @@ renderAll();
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWE64UYQMQFKT0nreF7ax59gzI2OsIVmE",
@@ -857,14 +856,11 @@ const firebaseConfig = {
 const STORAGE_KEY = 'noa_finance_data_v1';
 const app = initializeApp(firebaseConfig, 'noa-app');
 const db = getDatabase(app);
-const auth = getAuth(app);
 const cloudRef = ref(db, 'noa/data');
 
 let syncingFromCloud = false;
 let hasReloadedOnce = sessionStorage.getItem('noa_cloud_reloaded') === '1';
-let authReady = false;
 let dbConnected = false;
-let pendingWrite = null;
 
 /* ---- Indicador visible de sincronización ---- */
 const badge = document.createElement('div');
@@ -888,15 +884,6 @@ onValue(ref(db, '.info/connected'), (snap)=>{
   dbConnected = snap.val() === true;
   refreshBadge();
 });
-
-// Intentamos autenticar de forma anónima por si en el futuro las reglas
-// vuelven a exigirlo, pero como ahora las reglas de "noa" son públicas
-// (.read/.write: true), esto ya NO bloquea el guardado si falla o si el
-// proveedor Anónimo no está habilitado en el proyecto.
-signInAnonymously(auth).then(()=>{ authReady = true; }).catch(err=>{
-  console.warn('NOA: autenticación anónima no disponible (no es necesaria con reglas públicas) ->', err.code);
-});
-onAuthStateChanged(auth, (user)=>{ authReady = !!user; });
 
 function pushToCloud(value){
   setBadge('connecting', 'Guardando…');
