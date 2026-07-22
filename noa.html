@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -53,7 +54,7 @@
       radial-gradient(circle at 15% -10%, rgba(200,169,110,.07), transparent 45%),
       var(--bg);
   }
-
+ 
   /* HEADER */
   header{
     display:flex; align-items:center; justify-content:space-between;
@@ -75,7 +76,7 @@
   .icon-btn:active{transform:scale(.92);}
   .icon-btn:hover{color:var(--gold); border-color:var(--gold-dim);}
   .icon-btn svg{width:17px; height:17px;}
-
+ 
   /* MAIN VIEWS */
   main{flex:1; min-height:0; position:relative;}
   .view{
@@ -88,7 +89,7 @@
   }
   .view.active{opacity:1; pointer-events:auto; transform:translateY(0);}
   .view::-webkit-scrollbar{width:0;}
-
+ 
   /* CHAT */
   #view-chat{display:flex; flex-direction:column; padding-bottom:0;}
   #chat-log{flex:1; display:flex; flex-direction:column; gap:10px; padding-bottom:14px;}
@@ -102,7 +103,7 @@
   .msg-time{font-size:10px; color:var(--text-faint); margin-top:4px; align-self:flex-end;}
   .empty-chat{margin:auto; text-align:center; color:var(--text-faint); font-size:13.5px; padding:40px 20px;}
   .empty-chat b{display:block; color:var(--text-dim); font-family:'Syne',sans-serif; font-size:16px; margin-bottom:6px;}
-
+ 
   .chat-input-bar{
     flex-shrink:0; display:flex; align-items:flex-end; gap:8px;
     padding:12px 0 calc(14px + env(safe-area-inset-bottom));
@@ -123,11 +124,11 @@
   }
   #chat-send:active{transform:scale(.9);}
   #chat-send svg{width:18px; height:18px;}
-
+ 
   /* SECTION HEADINGS */
   .section-pad{padding-top:6px;}
   .section-title{font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin:4px 0 18px;}
-
+ 
   /* STATS */
   .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px;}
   .stat-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-sm); padding:14px;}
@@ -136,20 +137,20 @@
   .stat-card.wide{grid-column:1/3; display:flex; justify-content:space-between; align-items:center;}
   .stat-card.accent{background:var(--gold-soft); border-color:var(--gold-dim);}
   .stat-card.accent .value{color:var(--gold);}
-
+ 
   .cat-row{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
   .cat-row .cat-name{width:108px; flex-shrink:0; font-size:13px; color:var(--text-dim);}
   .cat-bar-track{flex:1; height:8px; background:var(--card-2); border-radius:6px; overflow:hidden;}
   .cat-bar-fill{height:100%; background:var(--gold); border-radius:6px; transition:width .5s ease;}
   .cat-amt{width:70px; text-align:right; font-size:12.5px; color:var(--text-dim); flex-shrink:0;}
-
+ 
   .subhead{font-family:'Syne',sans-serif; font-size:14px; color:var(--text-dim); margin:20px 0 12px; text-transform:uppercase; letter-spacing:.06em;}
-
+ 
   .oblig-row{display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
   .oblig-row:last-child{border-bottom:none;}
   .oblig-row .pend{color:var(--red);}
   .oblig-row .done{color:var(--green);}
-
+ 
   /* FUNDS */
   .fund-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-sm); padding:16px; margin-bottom:12px;}
   .fund-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
@@ -161,7 +162,7 @@
   .fund-bar-fill{height:100%; border-radius:6px; background:var(--gold); transition:width .6s ease;}
   .fund-bar-fill.done{background:var(--green);}
   .fund-tag{display:inline-block; margin-top:8px; font-size:10.5px; color:var(--green); background:rgba(127,174,130,.12); padding:3px 8px; border-radius:20px;}
-
+ 
   /* BOTTOM NAV */
   nav#bottomnav{
     flex-shrink:0; display:flex; justify-content:space-around;
@@ -175,7 +176,7 @@
   }
   .navbtn svg{width:21px; height:21px;}
   .navbtn.active{color:var(--gold);}
-
+ 
   /* MODAL / OVERLAY SHEETS */
   .sheet-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(2px);
@@ -192,7 +193,7 @@
   .sheet-backdrop.active .sheet{transform:translate(-50%, 0);}
   .sheet-handle{width:36px; height:4px; background:var(--line); border-radius:4px; margin:0 auto 16px;}
   .sheet-title{font-family:'Syne',sans-serif; font-size:19px; font-weight:700; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;}
-
+ 
   .hrow{display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
   .hrow:last-child{border-bottom:none;}
   .hrow .amt{font-family:'Syne',sans-serif; font-weight:700;}
@@ -201,7 +202,7 @@
   .hrow .meta{color:var(--text-faint); font-size:11.5px;}
   .undo-btn{background:var(--card); border:1px solid var(--line); color:var(--text-faint); font-size:11px; padding:5px 10px; border-radius:14px; cursor:pointer;}
   .undo-btn:hover{color:var(--red); border-color:var(--red);}
-
+ 
   .field{margin-bottom:14px;}
   .field label{display:block; font-size:11.5px; color:var(--text-faint); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em;}
   .field input{width:100%; background:var(--card); border:1px solid var(--line); color:var(--text); padding:11px 13px; border-radius:10px; font-size:14px; font-family:inherit;}
@@ -213,14 +214,14 @@
   .toggle.on{background:var(--gold-soft); border-color:var(--gold-dim);}
   .toggle .knob{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--text-faint); transition:transform .2s, background .2s;}
   .toggle.on .knob{transform:translateX(18px); background:var(--gold);}
-
+ 
   .fund-edit-card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px;}
   .fund-edit-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
   .fund-edit-head input.name-input{background:transparent; border:none; font-family:'Syne',sans-serif; font-size:15px; font-weight:600; color:var(--text); padding:0;}
   .remove-fund{color:var(--red); font-size:11px; cursor:pointer; opacity:.7;}
   .pct-total{font-size:12px; color:var(--text-dim); text-align:center; margin:6px 0 18px;}
   .pct-total.bad{color:var(--red);}
-
+ 
   .btn-primary{
     width:100%; background:var(--gold); color:#161105; border:none; padding:14px; border-radius:14px;
     font-family:'Syne',sans-serif; font-weight:700; font-size:14.5px; cursor:pointer; margin-top:6px;
@@ -235,7 +236,7 @@
 </head>
 <body>
 <div id="app">
-
+ 
   <header>
     <div class="brand">
       <span class="eyebrow">The Noise Maker</span>
@@ -250,7 +251,7 @@
       </button>
     </div>
   </header>
-
+ 
   <main>
     <!-- CHAT -->
     <section id="view-chat" class="view active">
@@ -262,7 +263,7 @@
         </button>
       </div>
     </section>
-
+ 
     <!-- STATS -->
     <section id="view-stats" class="view section-pad">
       <div class="section-title">Estado financiero</div>
@@ -272,14 +273,14 @@
       <div class="subhead">Obligaciones del mes</div>
       <div id="oblig-list"></div>
     </section>
-
+ 
     <!-- FUNDS -->
     <section id="view-funds" class="view section-pad">
       <div class="section-title">Fondos</div>
       <div id="funds-list"></div>
     </section>
   </main>
-
+ 
   <nav id="bottomnav">
     <button class="navbtn active" data-view="chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -295,7 +296,7 @@
     </button>
   </nav>
 </div>
-
+ 
 <!-- HISTORY SHEET -->
 <div class="sheet-backdrop" id="backdrop-history">
   <div class="sheet">
@@ -304,7 +305,7 @@
     <div id="history-list"></div>
   </div>
 </div>
-
+ 
 <!-- SETTINGS SHEET -->
 <div class="sheet-backdrop" id="backdrop-settings">
   <div class="sheet">
@@ -316,14 +317,14 @@
     <button class="btn-primary" id="btn-save-settings">Guardar cambios</button>
   </div>
 </div>
-
+ 
 <script>
 (function(){
 "use strict";
-
+ 
 /* ---------------- DATA MODEL ---------------- */
 const STORAGE_KEY = 'noa_finance_data_v1';
-
+ 
 function defaultData(){
   return {
     funds: [
@@ -344,14 +345,14 @@ function defaultData(){
     pending: null
   };
 }
-
+ 
 function currentMonthKey(){
   const d = new Date();
   return d.getFullYear()+'-'+d.getMonth();
 }
-
+ 
 let data = load();
-
+ 
 function load(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -364,7 +365,7 @@ function load(){
   }catch(e){ return defaultData(); }
 }
 function save(){ data.updatedAt = Date.now(); localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-
+ 
 function maybeMonthlyReset(){
   const key = currentMonthKey();
   if(data.lastResetMonth !== key){
@@ -374,7 +375,7 @@ function maybeMonthlyReset(){
   }
 }
 maybeMonthlyReset();
-
+ 
 /* ---------------- HELPERS ---------------- */
 function fmt(n){
   n = Math.round(n||0);
@@ -385,12 +386,12 @@ function normalize(s){
 }
 function fundById(id){ return data.funds.find(f=>f.id===id); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
-
+ 
 /* ---------------- NLU PARSER ---------------- */
 const INCOME_WORDS  = ['entr','ingres','recib','cobr','deposit','gan','entrada','me pagaron'];
 const REFUND_WORDS  = ['devol','reembols'];
 const EXPENSE_WORDS = ['gast','pagu','compr','sali','saque','abon'];
-
+ 
 const CATEGORY_MAP = [
   {keys:['alquiler','renta'], cat:'Alquiler', fund:'alquiler'},
   {keys:['luz','gas natural',' gas ','internet','wifi','telefon','celular','servicio'], cat:'Servicios', fund:'servicios'},
@@ -407,7 +408,7 @@ const CATEGORY_MAP = [
   {keys:['ropa','indumentaria'], cat:'Ropa', fund:'personal'},
   {keys:['salud','farmacia','medico','remedios'], cat:'Salud', fund:'personal'}
 ];
-
+ 
 function findAmount(normText){
   const matches = normText.match(/\d[\d.,]*\d|\d/g);
   if(!matches) return null;
@@ -419,7 +420,7 @@ function findAmount(normText){
   });
   return best;
 }
-
+ 
 function detectCategory(normText){
   for(const row of CATEGORY_MAP){
     for(const k of row.keys){
@@ -428,7 +429,7 @@ function detectCategory(normText){
   }
   return null;
 }
-
+ 
 function detectType(normText){
   const hasRefund = REFUND_WORDS.some(w=>normText.includes(w));
   if(hasRefund) return 'refund';
@@ -438,7 +439,7 @@ function detectType(normText){
   if(hasIncome) return 'income';
   return null;
 }
-
+ 
 function parseMessage(raw){
   const n = normalize(raw);
   const type = detectType(n);
@@ -446,10 +447,10 @@ function parseMessage(raw){
   const catRow = detectCategory(n);
   return {raw, type, amount, catRow};
 }
-
+ 
 /* ---------------- FINANCE ENGINE ---------------- */
 function isFundComplete(f){ return f.goal > 0 && f.current >= f.goal; }
-
+ 
 function distributeIncome(amount){
   const active = data.funds.filter(f=>!isFundComplete(f));
   const totalPct = active.reduce((s,f)=>s+f.percent,0) || 1;
@@ -473,12 +474,12 @@ function distributeIncome(amount){
   }
   return breakdown;
 }
-
+ 
 function recordTransaction(tx){
   data.transactions.unshift(tx);
   save();
 }
-
+ 
 function undoTransaction(id){
   const idx = data.transactions.findIndex(t=>t.id===id);
   if(idx === -1) return;
@@ -491,11 +492,11 @@ function undoTransaction(id){
   save();
   renderAll();
 }
-
+ 
 /* ---------------- CHAT RENDER ---------------- */
 const chatLog = document.getElementById('chat-log');
 const chatInput = document.getElementById('chat-input');
-
+ 
 function addMsg(text, who, skipSave){
   const emptyState = chatLog.querySelector('.empty-chat');
   if(emptyState) emptyState.remove();
@@ -509,7 +510,7 @@ function addMsg(text, who, skipSave){
     save();
   }
 }
-
+ 
 function renderEmptyChat(){
   if(data.chatLog && data.chatLog.length){
     chatLog.innerHTML = '';
@@ -519,12 +520,12 @@ function renderEmptyChat(){
   if(chatLog.children.length) return;
   chatLog.innerHTML = '<div class="empty-chat"><b>Contame qué pasó</b>Escribí algo como "Entraron 175000" o "Gasté 8500 en supermercado". Yo me encargo del resto.</div>';
 }
-
+ 
 function handleUserMessage(text){
   text = text.trim();
   if(!text) return;
   addMsg(escapeHtml(text), 'user');
-
+ 
   if(data.pending){
     const n = normalize(text);
     if(n.includes('ingreso') || n.includes('entro') || n.includes('cobre')){
@@ -538,9 +539,9 @@ function handleUserMessage(text){
       return;
     }
   }
-
+ 
   const parsed = parseMessage(text);
-
+ 
   if(parsed.type === 'refund'){
     const amt = parsed.amount || 0;
     if(!amt){ addMsg('¿De cuánto fue la devolución? Decime el monto.', 'bot'); return; }
@@ -551,13 +552,13 @@ function handleUserMessage(text){
     renderAll();
     return;
   }
-
+ 
   if(parsed.type === 'income'){
     if(!parsed.amount){ addMsg('¿De cuánto fue el ingreso? Decime el monto, por ejemplo "Entraron 90000".', 'bot'); return; }
     processIncome(parsed.amount, text, parsed.catRow);
     return;
   }
-
+ 
   if(parsed.type === 'expense'){
     let amt = parsed.amount;
     if(!amt && parsed.catRow){
@@ -570,7 +571,7 @@ function handleUserMessage(text){
     processExpense(amt, text, parsed.catRow);
     return;
   }
-
+ 
   // ambiguous — ask for clarification
   if(parsed.amount){
     data.pending = {amount: parsed.amount, raw: text, catRow: parsed.catRow};
@@ -578,10 +579,10 @@ function handleUserMessage(text){
     addMsg('No entendí si fue un <b>ingreso</b> o un <b>gasto</b> de ' + fmt(parsed.amount) + '. Respondé "ingreso" o "gasto" para confirmarlo.', 'bot');
     return;
   }
-
+ 
   addMsg('No pude identificar un monto en ese mensaje. Probá algo como "Gasté 8500 en supermercado" o "Entraron 90000".', 'bot');
 }
-
+ 
 function processIncome(amount, raw, catRow){
   const breakdown = distributeIncome(amount);
   recordTransaction({id:uid(), ts:Date.now(), type:'income', amount, category: catRow ? catRow.cat : 'Ingreso', raw, breakdown});
@@ -594,7 +595,7 @@ function processIncome(amount, raw, catRow){
   addMsg(lines, 'bot');
   renderAll();
 }
-
+ 
 function processExpense(amount, raw, catRow){
   const fundId = catRow ? catRow.fund : 'personal';
   const f = fundById(fundId) || fundById('personal');
@@ -608,13 +609,13 @@ function processExpense(amount, raw, catRow){
   addMsg(msg, 'bot');
   renderAll();
 }
-
+ 
 function escapeHtml(s){
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
 }
-
+ 
 /* ---------------- HISTORY RENDER ---------------- */
 function renderHistory(){
   const list = document.getElementById('history-list');
@@ -635,7 +636,7 @@ function renderHistory(){
     btn.addEventListener('click', ()=> undoTransaction(btn.getAttribute('data-undo')));
   });
 }
-
+ 
 /* ---------------- STATS RENDER ---------------- */
 function renderStats(){
   const now = new Date();
@@ -650,7 +651,7 @@ function renderStats(){
   const promedioDiario = gastos / dayOfMonth;
   const disponible = data.funds.reduce((s,f)=>s+f.current,0);
   const fondosCompletos = data.funds.filter(isFundComplete).length;
-
+ 
   document.getElementById('stat-grid').innerHTML = `
     <div class="stat-card"><div class="label">Ingresos del mes</div><div class="value">${fmt(ingresos)}</div></div>
     <div class="stat-card"><div class="label">Gastos del mes</div><div class="value">${fmt(gastos)}</div></div>
@@ -658,7 +659,7 @@ function renderStats(){
     <div class="stat-card"><div class="label">Promedio diario</div><div class="value">${fmt(promedioDiario)}</div></div>
     <div class="stat-card wide"><div><div class="label">Disponible total</div><div class="value">${fmt(disponible)}</div></div><div style="text-align:right"><div class="label">Fondos completos</div><div class="value">${fondosCompletos}/${data.funds.length}</div></div></div>
   `;
-
+ 
   const catTotals = {};
   monthTx.filter(t=>t.type==='expense').forEach(t=>{
     catTotals[t.category] = (catTotals[t.category]||0) + t.amount;
@@ -676,7 +677,7 @@ function renderStats(){
         <div class="cat-amt">${fmt(amt)}</div>
       </div>`).join('');
   }
-
+ 
   const obligFunds = data.funds.filter(f=>f.resetMonthly && f.goal>0);
   const obligEl = document.getElementById('oblig-list');
   if(!obligFunds.length){
@@ -688,7 +689,7 @@ function renderStats(){
     }).join('');
   }
 }
-
+ 
 /* ---------------- FUNDS RENDER ---------------- */
 function renderFunds(){
   const el = document.getElementById('funds-list');
@@ -703,13 +704,13 @@ function renderFunds(){
     </div>`;
   }).join('');
 }
-
+ 
 function renderAll(){
   renderStats();
   renderFunds();
   renderHistory();
 }
-
+ 
 /* ---------------- SETTINGS SHEET ---------------- */
 function renderSettingsForm(){
   const el = document.getElementById('funds-edit-list');
@@ -729,7 +730,7 @@ function renderSettingsForm(){
       </div>
     </div>
   `).join('');
-
+ 
   el.querySelectorAll('input[data-field]').forEach(inp=>{
     inp.addEventListener('input', e=>{
       const card = e.target.closest('.fund-edit-card');
@@ -759,14 +760,14 @@ function renderSettingsForm(){
   });
   updatePctTotal();
 }
-
+ 
 function updatePctTotal(){
   const total = data.funds.reduce((s,f)=>s+(f.percent||0),0);
   const label = document.getElementById('pct-total-label');
   label.textContent = 'Total asignado: ' + total + '%';
   label.classList.toggle('bad', total !== 100);
 }
-
+ 
 document.getElementById('btn-add-fund').addEventListener('click', ()=>{
   data.funds.push({id:uid(), name:'Nuevo fondo', percent:0, goal:0, current:0, resetMonthly:false, priority:data.funds.length+1});
   renderSettingsForm();
@@ -776,7 +777,7 @@ document.getElementById('btn-save-settings').addEventListener('click', ()=>{
   renderAll();
   closeSheet('settings');
 });
-
+ 
 /* ---------------- NAVIGATION ---------------- */
 document.querySelectorAll('.navbtn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -786,7 +787,7 @@ document.querySelectorAll('.navbtn').forEach(btn=>{
     document.getElementById('view-'+btn.getAttribute('data-view')).classList.add('active');
   });
 });
-
+ 
 function openSheet(name){
   document.getElementById('backdrop-'+name).classList.add('active');
   if(name==='history') renderHistory();
@@ -803,7 +804,7 @@ document.querySelectorAll('[data-close]').forEach(x=>{
 document.querySelectorAll('.sheet-backdrop').forEach(bd=>{
   bd.addEventListener('click', e=>{ if(e.target===bd) bd.classList.remove('active'); });
 });
-
+ 
 /* ---------------- CHAT INPUT WIRING ---------------- */
 document.getElementById('chat-send').addEventListener('click', ()=>{
   const val = chatInput.value;
@@ -821,21 +822,21 @@ chatInput.addEventListener('input', ()=>{
   chatInput.style.height = 'auto';
   chatInput.style.height = Math.min(110, chatInput.scrollHeight) + 'px';
 });
-
+ 
 /* ---------------- SERVICE WORKER ---------------- */
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
 }
-
+ 
 /* ---------------- INIT ---------------- */
 renderEmptyChat();
 renderAll();
-
+ 
 })();
 </script>
-
+ 
 <style>
   #noa-sync-badge{
     position:fixed; top:calc(8px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
@@ -850,12 +851,12 @@ renderAll();
   #noa-sync-badge.state-connecting .dot{background:#c8a96e; animation:noa-pulse 1s infinite;}
   @keyframes noa-pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 </style>
-
+ 
 <!-- ===== Firebase sync (evric-agenda) — capa aditiva, no toca la lógica de arriba ===== -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-
+ 
 const firebaseConfig = {
   apiKey: "AIzaSyDWE64UYQMQFKT0nreF7ax59gzI2OsIVmE",
   authDomain: "evric-agenda.firebaseapp.com",
@@ -865,39 +866,39 @@ const firebaseConfig = {
   messagingSenderId: "239254402707",
   appId: "1:239254402707:web:bda9f7ae205b14cb81bf66"
 };
-
+ 
 const STORAGE_KEY = 'noa_finance_data_v1';
 const app = initializeApp(firebaseConfig, 'noa-app');
 const db = getDatabase(app);
 const cloudRef = ref(db, 'noa/data');
-
+ 
 let syncingFromCloud = false;
 let hasReloadedOnce = sessionStorage.getItem('noa_cloud_reloaded') === '1';
 let dbConnected = false;
-
+ 
 /* ---- Indicador visible de sincronización ---- */
 const badge = document.createElement('div');
 badge.id = 'noa-sync-badge';
 badge.className = 'state-connecting';
 badge.innerHTML = '<span class="dot"></span><span class="txt">Conectando…</span>';
 document.body.appendChild(badge);
-
+ 
 function setBadge(state, text){
   badge.className = 'state-' + state;
   badge.querySelector('.txt').textContent = text;
 }
-
+ 
 function refreshBadge(){
   if(!dbConnected){ setBadge('error', 'Sin conexión a la nube'); return; }
   setBadge('synced', 'Sincronizado');
 }
-
+ 
 // Conexión real a la base (no es un supuesto: es el estado que reporta Firebase).
 onValue(ref(db, '.info/connected'), (snap)=>{
   dbConnected = snap.val() === true;
   refreshBadge();
 });
-
+ 
 function pushToCloud(value){
   setBadge('connecting', 'Guardando…');
   set(cloudRef, value).then(()=>{
@@ -908,7 +909,7 @@ function pushToCloud(value){
     setBadge('error', 'Error al guardar: ' + err.code);
   });
 }
-
+ 
 // Interceptamos localStorage.setItem para empujar cada cambio local a la nube,
 // sin modificar el motor de la app (que sigue llamando a save() como siempre).
 const originalSetItem = localStorage.setItem.bind(localStorage);
@@ -918,7 +919,7 @@ localStorage.setItem = function(key, value){
     try{ pushToCloud(JSON.parse(value)); }catch(e){ console.error('NOA: JSON inválido al sincronizar ->', e); }
   }
 };
-
+ 
 // Bajamos los datos de la nube al abrir la app, pero SOLO si son más nuevos
 // que lo que ya hay localmente. Esto evita que un snapshot viejo de la nube
 // (por ejemplo, guardado en algún momento en que la sincronización todavía
@@ -926,19 +927,19 @@ localStorage.setItem = function(key, value){
 onValue(cloudRef, (snapshot)=>{
   const cloudData = snapshot.val();
   if(!cloudData) return; // nada en la nube todavía: la primera escritura local la va a crear
-
+ 
   const localRaw = localStorage.getItem(STORAGE_KEY);
   const localData = localRaw ? JSON.parse(localRaw) : null;
   const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
   const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
-
+ 
   if(cloudUpdatedAt <= localUpdatedAt) return; // lo local es igual o más nuevo: no tocar nada
-
+ 
   const cloudRaw = JSON.stringify(cloudData);
   syncingFromCloud = true;
   originalSetItem(STORAGE_KEY, cloudRaw);
   syncingFromCloud = false;
-
+ 
   // Si la app ya había renderizado con datos viejos, recargamos una sola vez
   // para que tome el estado sincronizado desde la nube.
   if(!hasReloadedOnce){
@@ -953,3 +954,4 @@ onValue(cloudRef, (snapshot)=>{
 </script>
 </body>
 </html>
+ 
