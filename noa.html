@@ -338,6 +338,7 @@ function defaultData(){
       {id:'inversiones',name:'Inversiones',          percent:5,  goal:0,      current:0, resetMonthly:false, priority:9}
     ],
     transactions: [],
+    chatLog: [],
     lastResetMonth: currentMonthKey(),
     pending: null
   };
@@ -356,6 +357,7 @@ function load(){
     if(!raw) return defaultData();
     const parsed = JSON.parse(raw);
     if(!parsed.funds || !Array.isArray(parsed.funds)) return defaultData();
+    if(!Array.isArray(parsed.chatLog)) parsed.chatLog = [];
     return parsed;
   }catch(e){ return defaultData(); }
 }
@@ -492,7 +494,7 @@ function undoTransaction(id){
 const chatLog = document.getElementById('chat-log');
 const chatInput = document.getElementById('chat-input');
 
-function addMsg(text, who){
+function addMsg(text, who, skipSave){
   const emptyState = chatLog.querySelector('.empty-chat');
   if(emptyState) emptyState.remove();
   const wrap = document.createElement('div');
@@ -500,9 +502,18 @@ function addMsg(text, who){
   wrap.innerHTML = text;
   chatLog.appendChild(wrap);
   chatLog.parentElement.scrollTop = chatLog.parentElement.scrollHeight;
+  if(!skipSave){
+    data.chatLog.push({text, who, ts:Date.now()});
+    save();
+  }
 }
 
 function renderEmptyChat(){
+  if(data.chatLog && data.chatLog.length){
+    chatLog.innerHTML = '';
+    data.chatLog.forEach(m=> addMsg(m.text, m.who, true));
+    return;
+  }
   if(chatLog.children.length) return;
   chatLog.innerHTML = '<div class="empty-chat"><b>Contame qué pasó</b>Escribí algo como "Entraron 175000" o "Gasté 8500 en supermercado". Yo me encargo del resto.</div>';
 }
