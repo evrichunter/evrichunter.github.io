@@ -1271,8 +1271,8 @@ if(splashEl){
 <!-- ===== Firebase sync (evric-agenda) — capa aditiva, no toca la lógica de arriba ===== -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
- 
+import { getDatabase, ref, set, onValue, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
 const firebaseConfig = {
   apiKey: "AIzaSyDWE64UYQMQFKT0nreF7ax59gzI2OsIVmE",
   authDomain: "evric-agenda.firebaseapp.com",
@@ -1282,41 +1282,47 @@ const firebaseConfig = {
   messagingSenderId: "239254402707",
   appId: "1:239254402707:web:bda9f7ae205b14cb81bf66"
 };
- 
+
 const STORAGE_KEY = 'noa_finance_data_v1';
 const app = initializeApp(firebaseConfig, 'noa-app');
 const db = getDatabase(app);
 const cloudRef = ref(db, 'noa/data');
- 
+
 let syncingFromCloud = false;
 let dbConnected = false;
- 
+let initialSyncDone = false;
+let pendingLocalPush = null;
+
 /* ---- Indicador visible de sincronización ---- */
 const badge = document.createElement('div');
 badge.id = 'noa-sync-badge';
 badge.className = 'state-connecting';
 badge.innerHTML = '<span class="dot"></span><span class="txt">Conectando…</span>';
 document.body.appendChild(badge);
- 
+
 function setBadge(state, text){
   badge.className = 'state-' + state;
   badge.querySelector('.txt').textContent = text;
 }
- 
 function refreshBadge(){
   if(!dbConnected){ setBadge('error', 'Sin conexión a la nube'); return; }
   setBadge('synced', 'Sincronizado');
 }
- 
-// Conexión real a la base (no es un supuesto: es el estado que reporta Firebase).
 onValue(ref(db, '.info/connected'), (snap)=>{
   dbConnected = snap.val() === true;
   refreshBadge();
 });
- 
+
 function pushToCloud(value){
   setBadge('connecting', 'Guardando…');
-  set(cloudRef, value).then(()=>{
+  // CLAVE DEL FIX: "updatedAt" ya no sale del reloj de cada dispositivo
+  // (Date.now()), sino del reloj del SERVIDOR de Firebase. Antes, si el
+  // reloj del celular y el de la compu no coincidían, un aparato terminaba
+  // ignorando siempre los cambios del otro, y el otro los aceptaba siempre
+  // pisando lo que tenía cargado. Con el reloj del servidor, ambos comparan
+  // contra la misma referencia de tiempo.
+  const payload = Object.assign({}, value, { updatedAt: serverTimestamp() });
+  set(cloudRef, payload).then(()=>{
     setBadge('synced', 'Guardado en la nube ✓');
     setTimeout(refreshBadge, 4000);
   }).catch(err=>{
@@ -1324,53 +1330,74 @@ function pushToCloud(value){
     setBadge('error', 'Error al guardar: ' + err.code);
   });
 }
- 
-// Interceptamos localStorage.setItem para empujar cada cambio local a la nube,
-// sin modificar el motor de la app (que sigue llamando a save() como siempre).
+
 const originalSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function(key, value){
   originalSetItem(key, value);
   if(key === STORAGE_KEY && !syncingFromCloud){
+    if(!initialSyncDone){
+      // Todavía no leímos el estado real de la nube: guardamos este cambio
+      // para reenviarlo apenas confirmemos qué hay allá, en vez de arriesgar
+      // pisar datos más nuevos de otro dispositivo con una copia vieja.
+      pendingLocalPush = value;
+      return;
+    }
     try{ pushToCloud(JSON.parse(value)); }catch(e){ console.error('NOA: JSON inválido al sincronizar ->', e); }
   }
 };
- 
-// Bajamos los datos de la nube al abrir la app, pero SOLO si son más nuevos
-// que lo que ya hay localmente. Esto evita que un snapshot viejo de la nube
-// (por ejemplo, guardado en algún momento en que la sincronización todavía
-// fallaba) pise datos locales más recientes y reales.
+
+function sameContent(a, b){
+  // Compara ignorando "updatedAt" (que ahora lo resuelve el servidor y
+  // puede variar unos ms en el eco de nuestra propia escritura), para no
+  // re-renderizar la app cuando lo que llega de la nube es simplemente la
+  // confirmación de lo que este mismo dispositivo acaba de guardar.
+  if(!a || !b) return false;
+  const {updatedAt:ua, ...restA} = a;
+  const {updatedAt:ub, ...restB} = b;
+  try{ return JSON.stringify(restA) === JSON.stringify(restB); }
+  catch(e){ return false; }
+}
+
 onValue(cloudRef, (snapshot)=>{
   const cloudData = snapshot.val();
-  if(!cloudData) return; // nada en la nube todavía: la primera escritura local la va a crear
+
+  if(!initialSyncDone){
+    initialSyncDone = true;
+    if(pendingLocalPush){
+      const toPush = pendingLocalPush;
+      pendingLocalPush = null;
+      try{ pushToCloud(JSON.parse(toPush)); }catch(e){ console.error('NOA: error reenviando cambios pendientes ->', e); }
+    }
+  }
+
+  if(!cloudData) return;
   if(!cloudData.funds || !Array.isArray(cloudData.funds) || !cloudData.funds.length){
-    // Firebase Realtime Database borra los campos con array vacío al guardar
-    // (p.ej. "transactions: []" en el primer guardado), así que un snapshot
-    // sin "funds" válido está corrupto: no lo bajamos para no romper la app.
     console.warn('NOA: snapshot de la nube con forma inválida, se ignora ->', cloudData);
     return;
   }
   if(!Array.isArray(cloudData.transactions)) cloudData.transactions = [];
   if(!Array.isArray(cloudData.chatLog)) cloudData.chatLog = [];
   if(!Array.isArray(cloudData.receivables)) cloudData.receivables = [];
- 
+
   const localRaw = localStorage.getItem(STORAGE_KEY);
   const localData = localRaw ? JSON.parse(localRaw) : null;
   const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
   const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
- 
-  if(cloudUpdatedAt <= localUpdatedAt) return; // lo local es igual o más nuevo: no tocar nada
- 
+
+  if(cloudUpdatedAt < localUpdatedAt) return; // lo local es más nuevo: no tocar nada
+
+  const isOwnEcho = sameContent(cloudData, localData);
   const cloudRaw = JSON.stringify(cloudData);
+
   syncingFromCloud = true;
   originalSetItem(STORAGE_KEY, cloudRaw);
   syncingFromCloud = false;
- 
-  // Actualizamos la app EN VIVO con los datos nuevos, sin recargar la página.
-  // Antes esto recargaba una sola vez por sesión, lo que dejaba a la app
-  // mostrando datos viejos en memoria después de esa recarga: si vos editabas
-  // algo en ese momento, se guardaba (y subía a la nube) la versión vieja,
-  // borrando lo que habías hecho en el otro dispositivo. Ahora, cada cambio
-  // que llega de la nube se aplica al instante al estado en memoria.
+
+  if(isOwnEcho){
+    refreshBadge();
+    return;
+  }
+
   if(typeof window.__aira_applyRemoteData === 'function'){
     window.__aira_applyRemoteData(cloudData);
     setBadge('synced', 'Actualizado desde otro dispositivo');
