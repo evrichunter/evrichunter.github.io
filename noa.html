@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>NOA — Asistente Financiero</title>
+<title>AIRA — Asistente Financiero</title>
 <meta name="theme-color" content="#070707">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -145,6 +145,23 @@
  
   .subhead{font-family:'Syne',sans-serif; font-size:14px; color:var(--text-dim); margin:20px 0 12px; text-transform:uppercase; letter-spacing:.06em;}
  
+  /* PIE CHARTS */
+  .pie-wrap{display:flex; justify-content:center; margin-bottom:14px;}
+  .pie-wrap svg{filter:drop-shadow(0 4px 14px rgba(0,0,0,.35));}
+  .legend-row{display:flex; align-items:center; gap:8px; padding:6px 2px; font-size:12.5px; color:var(--text-dim); border-bottom:1px solid var(--line);}
+  .legend-row:last-child{border-bottom:none;}
+  .legend-dot{width:10px; height:10px; border-radius:50%; flex-shrink:0;}
+  .legend-label{flex:1; color:var(--text); display:flex; align-items:center; gap:6px;}
+  .legend-pct{color:var(--text-faint); width:36px; text-align:right; flex-shrink:0;}
+  .legend-amt{width:82px; text-align:right; color:var(--text-dim); flex-shrink:0;}
+  .pie-empty{text-align:center; color:var(--text-faint); font-size:13px; padding:16px 0 4px;}
+  .edit-cat-btn{color:var(--text-faint); cursor:pointer; margin-left:6px; font-size:12px;}
+  .edit-cat-btn:hover{color:var(--gold);}
+  .cat-edit-input{
+    background:var(--card-2); border:1px solid var(--gold-dim); color:var(--text);
+    border-radius:8px; padding:4px 8px; font-size:13px; font-family:inherit; width:150px;
+  }
+ 
   .oblig-row{display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
   .oblig-row:last-child{border-bottom:none;}
   .oblig-row .pend{color:var(--red);}
@@ -252,15 +269,54 @@
     font-size:13px; cursor:pointer; margin-top:4px;
   }
   .close-x{color:var(--text-faint); cursor:pointer; font-size:20px; line-height:1;}
+ 
+  /* SPLASH SCREEN */
+  #splash{
+    position:fixed; inset:0; z-index:9999;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 40%, rgba(200,169,110,.10), transparent 60%), var(--bg);
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  #splash.hide{opacity:0; visibility:hidden; pointer-events:none;}
+  .splash-inner{position:relative; display:flex; flex-direction:column; align-items:center;}
+  .splash-logo{
+    font-family:'Syne',sans-serif; font-weight:800; font-size:52px; letter-spacing:.03em;
+    background:linear-gradient(120deg, var(--text) 35%, var(--gold) 50%, var(--text) 65%);
+    background-size:280% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:aira-shine 2.2s ease-in-out infinite;
+  }
+  .splash-logo span{ color:var(--gold); -webkit-text-fill-color:var(--gold); }
+  @keyframes aira-shine{ 0%{background-position:220% 0;} 100%{background-position:-120% 0;} }
+  .splash-sub{
+    margin-top:14px; font-size:13.5px; color:var(--text-dim); text-align:center; letter-spacing:.01em;
+    opacity:0; animation:aira-fadein .7s ease forwards; animation-delay:.55s;
+  }
+  @keyframes aira-fadein{ to{opacity:1;} }
+  .splash-spark{position:absolute; color:var(--gold); opacity:0; animation:aira-spark 1.6s ease-in-out infinite;}
+  .splash-spark.s1{top:-18px; left:-28px; font-size:16px; animation-delay:.2s;}
+  .splash-spark.s2{top:6px; right:-34px; font-size:12px; animation-delay:.7s;}
+  .splash-spark.s3{bottom:-14px; left:20%; font-size:10px; animation-delay:1.1s;}
+  @keyframes aira-spark{ 0%,100%{opacity:0; transform:scale(.6);} 50%{opacity:1; transform:scale(1.15);} }
 </style>
 </head>
 <body>
+<div id="splash">
+  <div class="splash-inner">
+    <span class="splash-spark s1">✦</span>
+    <span class="splash-spark s2">✦</span>
+    <span class="splash-spark s3">✦</span>
+    <div class="splash-logo">AIR<span>A</span></div>
+    <div class="splash-sub">Bienvenido Evric, así están tus cuentas</div>
+  </div>
+</div>
+ 
 <div id="app">
  
   <header>
     <div class="brand">
-      <span class="eyebrow">The Noise Maker</span>
-      <h1>NO<span>A</span></h1>
+      <span class="eyebrow">Asesora Inteligente de Recursos y Ahorro</span>
+      <h1>AIR<span>A</span></h1>
     </div>
     <div class="actions">
       <button class="icon-btn" id="btn-clear-chat" title="Vaciar chat">
@@ -291,6 +347,8 @@
     <section id="view-stats" class="view section-pad">
       <div class="section-title">Estado financiero</div>
       <div class="stat-grid" id="stat-grid"></div>
+      <div class="subhead">Ingreso por origen</div>
+      <div id="income-breakdown"></div>
       <div class="subhead">Gasto por categoría</div>
       <div id="cat-breakdown"></div>
       <div class="subhead">Obligaciones del mes</div>
@@ -464,6 +522,40 @@ maybeMonthlyReset();
 function fmt(n){
   n = Math.round(n||0);
   return '$' + n.toLocaleString('es-AR');
+}
+ 
+/* ---------------- PIE CHART HELPERS ---------------- */
+const PIE_COLORS = ['#c8a96e','#7fae82','#c07b6a','#7a93c0','#a586c9','#6fbfae','#d1975c','#c98aa8','#9fb768','#7f9bc4'];
+function colorForLabel(label){
+  let hash = 0;
+  for(let i=0;i<label.length;i++){ hash = (hash*31 + label.charCodeAt(i)) >>> 0; }
+  return PIE_COLORS[hash % PIE_COLORS.length];
+}
+function buildPieSVG(entries, size){
+  size = size || 150;
+  const total = entries.reduce((s,[,v])=>s+v,0) || 1;
+  const R = size/2, cx = R, cy = R;
+  if(entries.length === 1){
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${R-1}" fill="${colorForLabel(entries[0][0])}"/></svg>`;
+  }
+  let angle = -90;
+  const toRad = d => d*Math.PI/180;
+  const paths = entries.map(([label, val])=>{
+    const sweep = (val/total)*360;
+    const start = angle, end = angle + sweep;
+    angle = end;
+    const large = sweep > 180 ? 1 : 0;
+    const x1 = cx + R*Math.cos(toRad(start)), y1 = cy + R*Math.sin(toRad(start));
+    const x2 = cx + R*Math.cos(toRad(end)), y2 = cy + R*Math.sin(toRad(end));
+    return `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${large} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${colorForLabel(label)}"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${paths}</svg>`;
+}
+function buildLegend(entries, total){
+  return entries.map(([label,val])=>{
+    const pct = total ? Math.round(val/total*100) : 0;
+    return `<div class="legend-row"><span class="legend-dot" style="background:${colorForLabel(label)}"></span><span class="legend-label">${label}</span><span class="legend-pct">${pct}%</span><span class="legend-amt">${fmt(val)}</span></div>`;
+  }).join('');
 }
 function normalize(s){
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -763,12 +855,44 @@ function renderHistory(){
     const dateStr = d.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'}) + ' · ' + d.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
     const sign = tx.type === 'income' ? '+' : '-';
     const cls = tx.type === 'income' ? 'pos' : 'neg';
-    return '<div class="hrow"><div><div>'+tx.category+'</div><div class="meta">'+dateStr+'</div></div>' +
+    const editBtn = tx.type === 'income' ? `<span class="edit-cat-btn" data-edit="${tx.id}" title="Editar categoría">✎</span>` : '';
+    return '<div class="hrow"><div><div><span class="hrow-cat" data-cat-id="'+tx.id+'">'+tx.category+'</span>'+editBtn+'</div><div class="meta">'+dateStr+'</div></div>' +
       '<div style="display:flex; align-items:center; gap:10px;"><span class="amt '+cls+'">'+sign+fmt(tx.amount)+'</span>' +
       '<span class="undo-btn" data-undo="'+tx.id+'">Deshacer</span></div></div>';
   }).join('');
   list.querySelectorAll('[data-undo]').forEach(btn=>{
     btn.addEventListener('click', ()=> undoTransaction(btn.getAttribute('data-undo')));
+  });
+  list.querySelectorAll('[data-edit]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const id = btn.getAttribute('data-edit');
+      const catSpan = list.querySelector('[data-cat-id="'+id+'"]');
+      const tx = data.transactions.find(t=>t.id===id);
+      if(!tx || !catSpan) return;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = tx.category;
+      input.className = 'cat-edit-input';
+      catSpan.replaceWith(input);
+      btn.style.display = 'none';
+      input.focus();
+      input.select();
+      let committed = false;
+      function commit(){
+        if(committed) return;
+        committed = true;
+        const val = input.value.trim();
+        if(val) tx.category = val;
+        save();
+        renderAll();
+      }
+      input.addEventListener('keydown', ev=>{
+        if(ev.key === 'Enter'){ ev.preventDefault(); commit(); }
+        if(ev.key === 'Escape'){ committed = true; renderHistory(); }
+      });
+      input.addEventListener('blur', commit);
+    });
   });
 }
  
@@ -795,22 +919,30 @@ function renderStats(){
     <div class="stat-card wide"><div><div class="label">Disponible total</div><div class="value">${fmt(disponible)}</div></div><div style="text-align:right"><div class="label">Fondos completos</div><div class="value">${fondosCompletos}/${data.funds.length}</div></div></div>
   `;
  
+  const incomeTotals = {};
+  monthTx.filter(t=>t.type==='income').forEach(t=>{
+    incomeTotals[t.category] = (incomeTotals[t.category]||0) + t.amount;
+  });
+  const incomeEntries = Object.entries(incomeTotals).sort((a,b)=>b[1]-a[1]);
+  const incomeSum = incomeEntries.reduce((s,[,v])=>s+v,0);
+  const incomeEl = document.getElementById('income-breakdown');
+  if(!incomeEntries.length){
+    incomeEl.innerHTML = '<div class="pie-empty">Sin ingresos registrados este mes.</div>';
+  } else {
+    incomeEl.innerHTML = `<div class="pie-wrap">${buildPieSVG(incomeEntries, 150)}</div>` + buildLegend(incomeEntries, incomeSum);
+  }
+ 
   const catTotals = {};
   monthTx.filter(t=>t.type==='expense').forEach(t=>{
     catTotals[t.category] = (catTotals[t.category]||0) + t.amount;
   });
   const catEntries = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
-  const maxCat = catEntries.length ? catEntries[0][1] : 1;
+  const catSum = catEntries.reduce((s,[,v])=>s+v,0);
   const catEl = document.getElementById('cat-breakdown');
   if(!catEntries.length){
-    catEl.innerHTML = '<div style="color:var(--text-faint); font-size:13px; padding:6px 0 4px;">Sin gastos registrados este mes.</div>';
+    catEl.innerHTML = '<div class="pie-empty">Sin gastos registrados este mes.</div>';
   } else {
-    catEl.innerHTML = catEntries.map(([cat, amt])=>`
-      <div class="cat-row">
-        <div class="cat-name">${cat}</div>
-        <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.max(6, amt/maxCat*100)}%"></div></div>
-        <div class="cat-amt">${fmt(amt)}</div>
-      </div>`).join('');
+    catEl.innerHTML = `<div class="pie-wrap">${buildPieSVG(catEntries, 150)}</div>` + buildLegend(catEntries, catSum);
   }
  
   const obligFunds = data.funds.filter(f=>f.resetMonthly && f.goal>0);
@@ -1090,6 +1222,12 @@ if('serviceWorker' in navigator){
 /* ---------------- INIT ---------------- */
 renderEmptyChat();
 renderAll();
+ 
+const splashEl = document.getElementById('splash');
+if(splashEl){
+  setTimeout(()=> splashEl.classList.add('hide'), 2400);
+  setTimeout(()=> splashEl.remove(), 3000);
+}
  
 })();
 </script>
