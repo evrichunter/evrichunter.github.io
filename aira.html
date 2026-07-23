@@ -1221,6 +1221,25 @@ if('serviceWorker' in navigator){
   });
 }
  
+function rebuildChatFromData(){
+  chatLog.innerHTML = '';
+  if(data.chatLog && data.chatLog.length){
+    data.chatLog.forEach(m=> addMsg(m.text, m.who, true));
+  } else {
+    chatLog.innerHTML = '<div class="empty-chat"><b>Contame qué pasó</b>Escribí algo como "Entraron 175000" o "Gasté 8500 en supermercado". Yo me encargo del resto.</div>';
+  }
+}
+ 
+// Gancho para que la sincronización con la nube actualice la app EN VIVO,
+// sin recargar la página, evitando que una recarga "gastada" deje a la app
+// mostrando datos viejos en memoria (lo que causaba que un dispositivo
+// pisara los cambios de otro al guardar).
+window.__aira_applyRemoteData = function(newData){
+  data = newData;
+  rebuildChatFromData();
+  renderAll();
+};
+ 
 /* ---------------- INIT ---------------- */
 renderEmptyChat();
 renderAll();
@@ -1270,7 +1289,6 @@ const db = getDatabase(app);
 const cloudRef = ref(db, 'noa/data');
  
 let syncingFromCloud = false;
-let hasReloadedOnce = sessionStorage.getItem('noa_cloud_reloaded') === '1';
 let dbConnected = false;
  
 /* ---- Indicador visible de sincronización ---- */
@@ -1333,6 +1351,7 @@ onValue(cloudRef, (snapshot)=>{
   }
   if(!Array.isArray(cloudData.transactions)) cloudData.transactions = [];
   if(!Array.isArray(cloudData.chatLog)) cloudData.chatLog = [];
+  if(!Array.isArray(cloudData.receivables)) cloudData.receivables = [];
  
   const localRaw = localStorage.getItem(STORAGE_KEY);
   const localData = localRaw ? JSON.parse(localRaw) : null;
@@ -1346,11 +1365,17 @@ onValue(cloudRef, (snapshot)=>{
   originalSetItem(STORAGE_KEY, cloudRaw);
   syncingFromCloud = false;
  
-  // Si la app ya había renderizado con datos viejos, recargamos una sola vez
-  // para que tome el estado sincronizado desde la nube.
-  if(!hasReloadedOnce){
-    hasReloadedOnce = true;
-    sessionStorage.setItem('noa_cloud_reloaded', '1');
+  // Actualizamos la app EN VIVO con los datos nuevos, sin recargar la página.
+  // Antes esto recargaba una sola vez por sesión, lo que dejaba a la app
+  // mostrando datos viejos en memoria después de esa recarga: si vos editabas
+  // algo en ese momento, se guardaba (y subía a la nube) la versión vieja,
+  // borrando lo que habías hecho en el otro dispositivo. Ahora, cada cambio
+  // que llega de la nube se aplica al instante al estado en memoria.
+  if(typeof window.__aira_applyRemoteData === 'function'){
+    window.__aira_applyRemoteData(cloudData);
+    setBadge('synced', 'Actualizado desde otro dispositivo');
+    setTimeout(refreshBadge, 4000);
+  } else {
     location.reload();
   }
 }, (err)=>{
