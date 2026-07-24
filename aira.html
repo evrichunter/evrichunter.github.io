@@ -1269,6 +1269,7 @@ if(splashEl){
 </style>
  
 <!-- ===== Firebase sync (evric-agenda) — capa aditiva, no toca la lógica de arriba ===== -->
+<!-- ===== Firebase sync (evric-agenda) — capa aditiva, no toca la lógica de arriba ===== -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, set, onValue, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
@@ -1317,10 +1318,12 @@ function pushToCloud(value){
   setBadge('connecting', 'Guardando…');
   // CLAVE DEL FIX: "updatedAt" ya no sale del reloj de cada dispositivo
   // (Date.now()), sino del reloj del SERVIDOR de Firebase. Antes, si el
-  // reloj del celular y el de la compu no coincidían, un aparato terminaba
-  // ignorando siempre los cambios del otro, y el otro los aceptaba siempre
-  // pisando lo que tenía cargado. Con el reloj del servidor, ambos comparan
-  // contra la misma referencia de tiempo.
+  // reloj del celular estaba aunque sea unos segundos desfasado respecto
+  // al de la computadora, un aparato terminaba ignorando SIEMPRE los
+  // cambios del otro (por tener un timestamp "más chico" según su propio
+  // reloj), y el otro aceptaba SIEMPRE pisando lo que tenía cargado (por
+  // tener un timestamp "más grande"). Con el reloj del servidor, ambos
+  // dispositivos comparan contra la misma referencia de tiempo real.
   const payload = Object.assign({}, value, { updatedAt: serverTimestamp() });
   set(cloudRef, payload).then(()=>{
     setBadge('synced', 'Guardado en la nube ✓');
@@ -1360,7 +1363,6 @@ function sameContent(a, b){
 
 onValue(cloudRef, (snapshot)=>{
   const cloudData = snapshot.val();
-  const isFirstSnapshot = !initialSyncDone;
 
   if(!initialSyncDone){
     initialSyncDone = true;
@@ -1382,19 +1384,10 @@ onValue(cloudRef, (snapshot)=>{
 
   const localRaw = localStorage.getItem(STORAGE_KEY);
   const localData = localRaw ? JSON.parse(localRaw) : null;
+  const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
+  const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
 
-  // La comparación por "updatedAt" (reloj del dispositivo) SOLO tiene sentido
-  // en la primera lectura de esta pestaña: sirve para no pisar cambios
-  // hechos offline antes de conectar con la nube. Para todas las
-  // actualizaciones en tiempo real que llegan después, la nube es siempre
-  // la fuente de verdad — este era el bug: si el reloj de un dispositivo
-  // estaba apenas adelantado respecto al otro, sus cambios locales "ganaban"
-  // siempre la comparación y los cambios de otros dispositivos se perdían.
-  if(isFirstSnapshot){
-    const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
-    const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
-    if(cloudUpdatedAt < localUpdatedAt) return;
-  }
+  if(cloudUpdatedAt < localUpdatedAt) return; // lo local es más nuevo: no tocar nada
 
   const isOwnEcho = sameContent(cloudData, localData);
   const cloudRaw = JSON.stringify(cloudData);
