@@ -1360,6 +1360,7 @@ function sameContent(a, b){
 
 onValue(cloudRef, (snapshot)=>{
   const cloudData = snapshot.val();
+  const isFirstSnapshot = !initialSyncDone;
 
   if(!initialSyncDone){
     initialSyncDone = true;
@@ -1381,10 +1382,19 @@ onValue(cloudRef, (snapshot)=>{
 
   const localRaw = localStorage.getItem(STORAGE_KEY);
   const localData = localRaw ? JSON.parse(localRaw) : null;
-  const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
-  const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
 
-  if(cloudUpdatedAt < localUpdatedAt) return; // lo local es más nuevo: no tocar nada
+  // La comparación por "updatedAt" (reloj del dispositivo) SOLO tiene sentido
+  // en la primera lectura de esta pestaña: sirve para no pisar cambios
+  // hechos offline antes de conectar con la nube. Para todas las
+  // actualizaciones en tiempo real que llegan después, la nube es siempre
+  // la fuente de verdad — este era el bug: si el reloj de un dispositivo
+  // estaba apenas adelantado respecto al otro, sus cambios locales "ganaban"
+  // siempre la comparación y los cambios de otros dispositivos se perdían.
+  if(isFirstSnapshot){
+    const localUpdatedAt = localData && typeof localData.updatedAt === 'number' ? localData.updatedAt : 0;
+    const cloudUpdatedAt = typeof cloudData.updatedAt === 'number' ? cloudData.updatedAt : 0;
+    if(cloudUpdatedAt < localUpdatedAt) return;
+  }
 
   const isOwnEcho = sameContent(cloudData, localData);
   const cloudRaw = JSON.stringify(cloudData);
