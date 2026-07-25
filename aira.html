@@ -713,6 +713,8 @@ function userMessageEcho(text){
 
 function processIncome(amount, raw, catRow){
   const {deltas, breakdown} = distributeIncome(amount);
+  const before = {};
+  Object.keys(deltas).forEach(id=> before[id] = effectiveBalance(id));
   applyDeltas(deltas);
   pushTx({ts:Date.now(), type:'income', amount, category: catRow ? catRow.cat : 'Ingreso', raw, breakdown});
   let lines = '<b>Ingreso registrado</b>\n' + fmt(amount) + '\n\nDistribución automática:\n';
@@ -720,16 +722,18 @@ function processIncome(amount, raw, catRow){
     lines += '• ' + b.name + ' <span class="amt-pos">+' + fmt(b.amount) + '</span>' + (b.completed ? ' → completo ✅' : '') + '\n';
   });
   const disponible = Object.keys(funds).filter(id=>!['alquiler','servicios','deuda'].includes(id))
-    .reduce((s,id)=> s + effectiveBalance(id) + (deltas[id]||0), 0);
+    .reduce((s,id)=> s + before[id] + (deltas[id]||0), 0);
   lines += '\nDisponible ahora: ' + fmt(disponible);
   botMessage(lines);
 }
+
 function processExpense(amount, raw, catRow){
   const fundId = (catRow && funds[catRow.fund]) ? catRow.fund : 'personal';
   const f = funds[fundId];
+  const before = effectiveBalance(fundId);
   applyDeltas({[fundId]: -amount});
   pushTx({ts:Date.now(), type:'expense', amount, category: catRow ? catRow.cat : 'Otros', raw, breakdown:[{fundId, name:f.name, amount:-amount}]});
-  const projected = effectiveBalance(fundId) - amount;
+  const projected = before - amount;
   let msg = '<b>Gasto registrado</b>\n' + fmt(amount) + ' — ' + (catRow ? catRow.cat : 'Otros') + '\nFondo afectado: ' + f.name;
   if(projected < 0) msg += '\n⚠️ Saldo del fondo en negativo.';
   msg += '\nSaldo restante: <span class="' + (projected>=0?'amt-pos':'amt-neg') + '">' + fmt(projected) + '</span>';
